@@ -39,7 +39,7 @@ class WatsonxService {
       throw new Error(`Failed to get access token: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as { access_token: string };
     return data.access_token;
   }
 
@@ -152,7 +152,7 @@ JSON OUTPUT:`;
         throw new Error(`Watsonx API error: ${response.status} - ${errorText}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as { results?: Array<{ generated_text?: string }> };
       const generatedText = data.results?.[0]?.generated_text?.trim();
 
       if (!generatedText) {

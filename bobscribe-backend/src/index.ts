@@ -41,16 +41,17 @@ async function bootstrap() {
   });
 
   // Global error handler
-  fastify.setErrorHandler((error, request, reply) => {
+  fastify.setErrorHandler((error, _request, reply) => {
     fastify.log.error(error);
 
-    const statusCode = error.statusCode || 500;
-    const message = error.message || 'Internal Server Error';
+    const err = error as Error & { statusCode?: number };
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
 
     reply.code(statusCode).send({
       success: false,
       error: message,
-      ...(env.NODE_ENV === 'development' && { stack: error.stack }),
+      ...(env.NODE_ENV === 'development' && { stack: err.stack }),
     });
   });
 
@@ -58,7 +59,7 @@ async function bootstrap() {
   await fastify.register(plannerRoutes, { prefix: '/api/v1/planner' });
 
   // Root health check
-  fastify.get('/', async (request, reply) => {
+  fastify.get('/', async () => {
     return {
       service: 'BobScribe Backend API',
       version: '1.0.0',

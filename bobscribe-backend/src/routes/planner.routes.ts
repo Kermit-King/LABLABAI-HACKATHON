@@ -69,7 +69,7 @@ export async function plannerRoutes(fastify: FastifyInstance) {
         data: intentPayload,
       });
     } catch (error) {
-      fastify.log.error('Error in /analyze endpoint:', error);
+      fastify.log.error({ err: error }, 'Error in /analyze endpoint:');
       
       return reply.code(500).send({
         success: false,
@@ -82,7 +82,7 @@ export async function plannerRoutes(fastify: FastifyInstance) {
    * GET /api/v1/planner/health
    * Health check endpoint
    */
-  fastify.get('/health', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/health', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
       const watsonSTTHealthy = await watsonSTTService.healthCheck();
       const watsonxHealthy = await watsonxService.healthCheck();
@@ -97,7 +97,7 @@ export async function plannerRoutes(fastify: FastifyInstance) {
         },
       });
     } catch (error) {
-      fastify.log.error('Health check error:', error);
+      fastify.log.error({ err: error }, 'Health check error:');
       
       return reply.code(503).send({
         success: false,
