@@ -8,6 +8,17 @@ interface ProjectPlannerContextType extends ProjectPlannerState {
   toggleAcceptanceCriteria: (issueId: string, criteriaId: string) => void;
   toggleImplementationStep: (stepOrder: number) => void;
   resetState: () => void;
+  githubRepoUrl: string;
+  setGithubRepoUrl: (url: string) => void;
+  audioFile: File | null;
+  setAudioFile: (file: File | null) => void;
+  isGithubConnected: boolean;
+  setIsGithubConnected: (connected: boolean) => void;
+  selectedBranch: string;
+  setSelectedBranch: (branch: string) => void;
+  availableBranches: string[];
+  connectToGithub: () => Promise<void>;
+  isConnecting: boolean;
 }
 
 const ProjectPlannerContext = createContext<ProjectPlannerContextType | undefined>(undefined);
@@ -21,8 +32,31 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
     isProcessing: false,
   });
 
+  const [githubRepoUrl, setGithubRepoUrl] = useState<string>('');
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [isGithubConnected, setIsGithubConnected] = useState<boolean>(false);
+  const [selectedBranch, setSelectedBranch] = useState<string>('');
+  const [availableBranches, setAvailableBranches] = useState<string[]>([]);
+  const [isConnecting, setIsConnecting] = useState<boolean>(false);
+
   const setTranscript = (transcript: string) => {
     setState(prev => ({ ...prev, transcript }));
+  };
+
+  const connectToGithub = async () => {
+    if (!githubRepoUrl.trim()) return;
+    
+    setIsConnecting(true);
+    
+    // Simulate API call to GitHub
+    setTimeout(() => {
+      // Mock branches - in real implementation, fetch from GitHub API
+      const mockBranches = ['main', 'dev', 'staging', 'feature/new-feature'];
+      setAvailableBranches(mockBranches);
+      setSelectedBranch(mockBranches[0]); // Default to first branch
+      setIsGithubConnected(true);
+      setIsConnecting(false);
+    }, 1000);
   };
 
   const extractEngineeringIntent = () => {
@@ -89,6 +123,17 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
         toggleAcceptanceCriteria,
         toggleImplementationStep,
         resetState,
+        githubRepoUrl,
+        setGithubRepoUrl,
+        audioFile,
+        setAudioFile,
+        isGithubConnected,
+        setIsGithubConnected,
+        selectedBranch,
+        setSelectedBranch,
+        availableBranches,
+        connectToGithub,
+        isConnecting,
       }}
     >
       {children}
