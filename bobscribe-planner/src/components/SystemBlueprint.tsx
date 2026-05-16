@@ -1,23 +1,56 @@
-import React from 'react';
-import { AlertTriangle, CheckCircle2, Copy, FileCode } from 'lucide-react';
+import React, { useState } from 'react';
+import { AlertTriangle, CheckCircle2, Copy, FileCode, Download, FileText, Clipboard, Check } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/Card';
 import { Badge } from './ui/Badge';
 import { Button } from './ui/Button';
 import { useProjectPlanner } from '../context/ProjectPlannerContext';
 import { useToast } from './ui/Toast';
-import { getRiskColor, copyToClipboard } from '../lib/utils';
+import { getRiskColor, copyToClipboard, technicalTaskToMarkdown, downloadMarkdown } from '../lib/utils';
+import { SkeletonBlock } from './ui/SkeletonBlock';
 
 export const SystemBlueprint: React.FC = () => {
-  const { technicalTask, toggleImplementationStep } = useProjectPlanner();
+  const { technicalTask, toggleImplementationStep, isProcessing } = useProjectPlanner();
   const { showToast } = useToast();
+  const [copyState, setCopyState] = useState<'idle' | 'success' | 'error'>('idle');
 
+  // Skeleton loading state
+  if (isProcessing) {
+    return (
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <SkeletonBlock width="w-48" height="h-4" className="mb-2" />
+            <SkeletonBlock width="w-full" height="h-3" />
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <SkeletonBlock width="w-24" height="h-3" />
+              <SkeletonBlock width="w-full" height="h-16" rounded="rounded-lg" />
+            </div>
+            <div className="space-y-2">
+              <SkeletonBlock width="w-24" height="h-3" />
+              <SkeletonBlock width="w-full" height="h-16" rounded="rounded-lg" />
+            </div>
+            <div className="space-y-2">
+              <SkeletonBlock width="w-24" height="h-3" />
+              <SkeletonBlock width="w-full" height="h-16" rounded="rounded-lg" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Empty state
   if (!technicalTask) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center text-muted-foreground">
-          No technical task extracted yet. Process a transcript to see the system blueprint.
-        </CardContent>
-      </Card>
+      <div className="flex flex-col items-center justify-center h-full gap-3 py-12">
+        <FileText className="h-10 w-10 text-slate-500" />
+        <h3 className="text-sm font-medium text-slate-300">No blueprint yet</h3>
+        <p className="text-xs text-slate-500 text-center max-w-sm">
+          Paste a transcript and extract engineering intent to see the system breakdown here.
+        </p>
+      </div>
     );
   }
 
@@ -30,21 +63,75 @@ export const SystemBlueprint: React.FC = () => {
     }
   };
 
+  const handleExportMarkdown = () => {
+    try {
+      const markdown = technicalTaskToMarkdown(technicalTask);
+      downloadMarkdown(markdown, 'system-blueprint.md');
+      showToast('System blueprint exported to Markdown', 'success');
+    } catch (error) {
+      showToast('Failed to export to Markdown', 'error');
+    }
+  };
+
+  const handleCopyToClipboard = async () => {
+    try {
+      const markdown = technicalTaskToMarkdown(technicalTask);
+      await navigator.clipboard.writeText(markdown);
+      setCopyState('success');
+      setTimeout(() => setCopyState('idle'), 2000);
+    } catch (error) {
+      setCopyState('error');
+      setTimeout(() => setCopyState('idle'), 2000);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
+        <CardHeader className="px-4 py-4 lg:px-6 lg:py-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-1 flex-1">
               <CardTitle>{technicalTask.title}</CardTitle>
               <CardDescription>{technicalTask.description}</CardDescription>
             </div>
-            <Badge className={getRiskColor(technicalTask.riskLevel)}>
-              {technicalTask.riskLevel.toUpperCase()} RISK
-            </Badge>
+            <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+              <Badge className={getRiskColor(technicalTask.riskLevel)}>
+                {technicalTask.riskLevel.toUpperCase()} RISK
+              </Badge>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleExportMarkdown}
+                  variant="ghost"
+                  size="icon"
+                  className="text-slate-400 hover:text-white transition-colors"
+                  title="Download as Markdown"
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+                <Button
+                  onClick={handleCopyToClipboard}
+                  variant="ghost"
+                  size="icon"
+                  className="text-slate-400 hover:text-white transition-colors"
+                  title={copyState === 'success' ? 'Copied!' : copyState === 'error' ? 'Failed' : 'Copy to Clipboard'}
+                >
+                  {copyState === 'success' ? (
+                    <Check className="h-4 w-4 text-green-400" />
+                  ) : (
+                    <Clipboard className="h-4 w-4" />
+                  )}
+                </Button>
+                {copyState === 'success' && (
+                  <span className="text-xs text-green-400">Copied!</span>
+                )}
+                {copyState === 'error' && (
+                  <span className="text-xs text-red-400">Failed</span>
+                )}
+              </div>
+            </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 px-4 py-4 lg:px-6 lg:py-6">
           {/* Estimated Effort */}
           <div>
             <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">

@@ -33,15 +33,15 @@ function App() {
             </header>
 
           {/* Main Content */}
-          <main className="container mx-auto px-6 py-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-140px)]">
+          <main className="container mx-auto px-4 py-6 lg:px-8">
+            <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[420px_1fr]">
               {/* Left Panel */}
-              <div className="h-full">
+              <div className="w-full lg:sticky lg:top-24 lg:self-start">
                 <LeftPanel />
               </div>
 
               {/* Right Panel */}
-              <div className="h-full">
+              <div className="w-full lg:sticky lg:top-24 lg:self-start">
                 <RightPanel />
               </div>
             </div>

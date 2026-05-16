@@ -6,15 +6,15 @@ import { BobConsole } from './BobConsole';
 
 export const RightPanel: React.FC = () => {
   return (
-    <div className="h-full flex flex-col">
-      <Tabs defaultValue="blueprint" className="flex-1 flex flex-col">
-        <TabsList className="w-full justify-start">
+    <div className="flex flex-col">
+      <Tabs defaultValue="blueprint" className="flex flex-col">
+        <TabsList className="w-full justify-start overflow-x-auto flex-nowrap">
           <TabsTrigger value="blueprint">System Blueprint</TabsTrigger>
           <TabsTrigger value="issues">GitHub Issues</TabsTrigger>
           <TabsTrigger value="bob">Bob Console</TabsTrigger>
         </TabsList>
         
-        <div className="flex-1 overflow-auto scrollbar-thin mt-4">
+        <div className="mt-4">
           <TabsContent value="blueprint">
             <SystemBlueprint />
           </TabsContent>

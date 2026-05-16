@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { ProjectPlannerState, TechnicalTask, GithubIssue, BobPrompt } from '../types';
+import { ProjectPlannerState } from '../types';
 import { mockTechnicalTask, mockGithubIssues, mockBobPrompt } from '../data/mockData';
 
 interface ProjectPlannerContextType extends ProjectPlannerState {

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Sparkles, Github, Upload, Check, GitBranch } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/Card';
 import { Button } from './ui/Button';
@@ -22,6 +22,14 @@ export const LeftPanel: React.FC = () => {
     isConnecting
   } = useProjectPlanner();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [transcript]);
 
   const handleAudioUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -35,16 +43,16 @@ export const LeftPanel: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
       {/* GitHub Repository Link */}
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-3 px-4 lg:px-6">
           <CardTitle className="flex items-center gap-2 text-base">
             <Github className="h-4 w-4 text-primary" />
             GitHub Repository
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 px-4 lg:px-6">
           <div className="flex gap-2">
             <input
               type="text"
@@ -100,8 +108,8 @@ export const LeftPanel: React.FC = () => {
       </Card>
 
       {/* Main Input Card */}
-      <Card className="flex-1 flex flex-col">
-        <CardHeader>
+      <Card className="flex flex-col">
+        <CardHeader className="px-4 lg:px-6">
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
             Meeting Transcript Input
@@ -110,7 +118,7 @@ export const LeftPanel: React.FC = () => {
             Upload audio or paste your meeting notes to extract engineering requirements
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex-1 flex flex-col gap-4">
+        <CardContent className="flex flex-col gap-4 px-4 lg:px-6">
           {/* Audio Upload Button */}
           <div className="flex flex-col gap-2">
             <input
@@ -146,20 +154,22 @@ export const LeftPanel: React.FC = () => {
           </div>
 
           <textarea
+            ref={textareaRef}
             value={transcript}
             onChange={(e) => setTranscript(e.target.value)}
             placeholder="Paste your meeting transcript here...
 
 Example:
 'We need to implement a secure logout feature that properly clears cookies and revokes JWT tokens. The current implementation doesn't handle token revocation, which is a security risk. Users should be able to logout from all devices, and we need to ensure that revoked tokens can't be reused.'"
-            className="flex-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none scrollbar-thin"
+            className="w-full min-h-40 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+            style={{ overflowY: 'hidden' }}
           />
           
           <div className="flex items-center gap-3">
             <Button
               onClick={extractEngineeringIntent}
               disabled={!transcript.trim() || isProcessing}
-              className="flex-1"
+              className="w-full sm:w-auto"
             >
               {isProcessing ? (
                 <>
