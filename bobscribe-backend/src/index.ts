@@ -3,6 +3,7 @@ import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
 import { env } from './config/env.js';
 import { plannerRoutes } from './routes/planner.routes.js';
+import { githubRoutes } from './routes/github.routes.js';
 
 /**
  * Bootstrap the Fastify server
@@ -56,6 +57,7 @@ async function bootstrap() {
 
   // Register routes
   await fastify.register(plannerRoutes, { prefix: '/api/v1/planner' });
+  await fastify.register(githubRoutes, { prefix: '/api/v1/github' });
 
   // Root health check
   fastify.get('/', async (request, reply) => {
@@ -86,6 +88,9 @@ async function bootstrap() {
 ║   Endpoints:                                              ║
 ║   - POST /api/v1/planner/analyze                         ║
 ║   - GET  /api/v1/planner/health                          ║
+║   - GET  /api/v1/github/oauth/initiate                   ║
+║   - POST /api/v1/github/oauth/callback                   ║
+║   - GET  /api/v1/github/repository/:owner/:repo          ║
 ║                                                           ║
 ╚═══════════════════════════════════════════════════════════╝
     `);

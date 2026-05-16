@@ -19,7 +19,10 @@ export const LeftPanel: React.FC = () => {
     setSelectedBranch,
     availableBranches,
     connectToGithub,
-    isConnecting
+    isConnecting,
+    githubAccessToken,
+    setGithubAccessToken,
+    error
   } = useProjectPlanner();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -53,19 +56,27 @@ export const LeftPanel: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 px-4 lg:px-6">
-          <div className="flex gap-2">
+          <div className="space-y-2">
             <input
               type="text"
               value={githubRepoUrl}
               onChange={(e) => setGithubRepoUrl(e.target.value)}
               placeholder="https://github.com/username/repository"
               disabled={isGithubConnected}
-              className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            />
+            <input
+              type="password"
+              value={githubAccessToken}
+              onChange={(e) => setGithubAccessToken(e.target.value)}
+              placeholder="GitHub Personal Access Token (ghp_...)"
+              disabled={isGithubConnected}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             />
             <Button
               onClick={connectToGithub}
-              disabled={!githubRepoUrl.trim() || isGithubConnected || isConnecting}
-              className={isGithubConnected ? 'bg-green-600 hover:bg-green-700' : ''}
+              disabled={!githubRepoUrl.trim() || !githubAccessToken.trim() || isGithubConnected || isConnecting}
+              className={isGithubConnected ? 'bg-green-600 hover:bg-green-700 w-full' : 'w-full'}
               size="sm"
             >
               {isConnecting ? (
@@ -79,10 +90,16 @@ export const LeftPanel: React.FC = () => {
                   Connected
                 </>
               ) : (
-                'Connect'
+                'Connect to Repository'
               )}
             </Button>
           </div>
+
+          {error && (
+            <div className="text-xs text-red-400 bg-red-950/20 border border-red-900/30 rounded px-2 py-1">
+              {error}
+            </div>
+          )}
 
           {/* Branch Selector - Only shown when connected */}
           {isGithubConnected && (
@@ -165,25 +182,23 @@ Example:
             style={{ overflowY: 'hidden' }}
           />
           
-          <div className="flex items-center gap-3">
-            <Button
-              onClick={extractEngineeringIntent}
-              disabled={!transcript.trim() || isProcessing}
-              className="w-full sm:w-auto"
-            >
-              {isProcessing ? (
-                <>
-                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Extract Engineering Intent
-                </>
-              )}
-            </Button>
-          </div>
+          <Button
+            onClick={extractEngineeringIntent}
+            disabled={!transcript.trim() || isProcessing}
+            className="w-full"
+          >
+            {isProcessing ? (
+              <>
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Extract Engineering Intent {isGithubConnected && '(with GitHub Context)'}
+              </>
+            )}
+          </Button>
 
           <div className="text-xs text-muted-foreground space-y-1">
             <p className="font-medium">💡 Tips for better results:</p>
