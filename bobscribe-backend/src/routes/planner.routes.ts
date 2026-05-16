@@ -1,7 +1,9 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { watsonSTTService } from '../services/watson.service.js';
 import { watsonxService } from '../services/watsonx.service.js';
+import { githubService } from '../services/github.service.js';
 import type { AnalyzeRequest, AnalyzeResponse } from '../types/intent.js';
+import type { RepositoryMap } from '../types/github.js';
 
 /**
  * Register planner routes
@@ -59,9 +61,35 @@ export async function plannerRoutes(fastify: FastifyInstance) {
         });
       }
 
-      // Extract engineering intent using Watsonx.ai
+      // Fetch GitHub repository context if provided
+      let repositoryMap: RepositoryMap | undefined;
+      const body = request.body as AnalyzeRequest;
+      
+      if (body.repository) {
+        try {
+          fastify.log.info(`Fetching repository context: ${body.repository.owner}/${body.repository.name}@${body.repository.branch}`);
+          
+          // Fetch file tree
+          const fileTree = await githubService.fetchFileTree(
+            body.repository.owner,
+            body.repository.name,
+            body.repository.branch,
+            body.repository.token
+          );
+          
+          // Map repository structure
+          repositoryMap = githubService.mapRepositoryStructure(fileTree);
+          
+          fastify.log.info(`Repository mapped: ${repositoryMap.relevantFiles.length} relevant files found`);
+        } catch (error) {
+          fastify.log.warn('Failed to fetch repository context:', error);
+          // Continue without repository context
+        }
+      }
+
+      // Extract engineering intent using Watsonx.ai (with optional GitHub context)
       fastify.log.info('Extracting engineering intent...');
-      const intentPayload = await watsonxService.extractIntent(transcript);
+      const intentPayload = await watsonxService.extractIntent(transcript, repositoryMap);
       fastify.log.info('Intent extraction complete');
 
       return reply.code(200).send({

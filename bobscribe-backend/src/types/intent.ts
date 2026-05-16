@@ -20,6 +20,8 @@ export interface AffectedFile {
   path: string;
   changeType: ChangeType;
   description: string;
+  existsInRepo?: boolean;
+  currentContent?: string;
 }
 
 /**
@@ -29,6 +31,18 @@ export interface AcceptanceCriteria {
   id: string;
   description: string;
   completed: boolean;
+  affectedFiles?: string[];
+  testStrategy?: string;
+}
+
+/**
+ * Code reference within a GitHub issue
+ */
+export interface CodeReference {
+  file: string;
+  lineRange?: string;
+  snippet?: string;
+  reason: string;
 }
 
 /**
@@ -41,6 +55,10 @@ export interface GithubIssue {
   description: string;
   acceptanceCriteria: AcceptanceCriteria[];
   priority: Priority;
+  codeReferences?: CodeReference[];
+  estimatedEffort?: string;
+  dependencies?: string[];
+  labels?: string[];
 }
 
 /**
@@ -54,6 +72,35 @@ export interface ImplementationStep {
 }
 
 /**
+ * Repository information for GitHub-aware tasks
+ */
+export interface RepositoryInfo {
+  owner: string;
+  name: string;
+  branch: string;
+  url: string;
+}
+
+/**
+ * Codebase context metadata
+ */
+export interface CodebaseContext {
+  primaryLanguage: string;
+  framework?: string;
+  architecture?: string;
+  dependencies?: string[];
+}
+
+/**
+ * Related file with relevance scoring
+ */
+export interface RelatedFile {
+  path: string;
+  relevance: 'high' | 'medium' | 'low';
+  reason: string;
+}
+
+/**
  * Represents the complete technical task breakdown
  */
 export interface TechnicalTask {
@@ -64,6 +111,9 @@ export interface TechnicalTask {
   affectedFiles: AffectedFile[];
   implementationOrder: ImplementationStep[];
   estimatedEffort: string;
+  repository?: RepositoryInfo;
+  codebaseContext?: CodebaseContext;
+  relatedFiles?: RelatedFile[];
 }
 
 /**
@@ -95,6 +145,12 @@ export interface IntentPayload {
 export interface AnalyzeRequest {
   transcript?: string;
   audioFile?: Buffer;
+  repository?: {
+    owner: string;
+    name: string;
+    branch: string;
+    token: string;
+  };
 }
 
 /**

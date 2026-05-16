@@ -21,8 +21,13 @@ const envSchema = z.object({
 
   // Model Configuration
   WATSONX_MODEL_ID: z.string().default('ibm/granite-3-8b-instruct'),
-  WATSONX_MAX_TOKENS: z.string().default('4096').transform(Number),
+  WATSONX_MAX_TOKENS: z.string().default('8192').transform(Number),
   WATSONX_TEMPERATURE: z.string().default('0.1').transform(Number),
+
+  // GitHub OAuth Configuration
+  GITHUB_CLIENT_ID: z.string().optional(),
+  GITHUB_CLIENT_SECRET: z.string().optional(),
+  GITHUB_REDIRECT_URI: z.string().optional(),
 });
 
 // Validate and parse environment variables

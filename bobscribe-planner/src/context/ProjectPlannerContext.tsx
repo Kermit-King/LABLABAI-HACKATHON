@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { ProjectPlannerState } from '../types';
-import { mockTechnicalTask, mockGithubIssues, mockBobPrompt } from '../data/mockData';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
 interface ProjectPlannerContextType extends ProjectPlannerState {
   setTranscript: (transcript: string) => void;
-  extractEngineeringIntent: () => void;
+  extractEngineeringIntent: () => Promise<void>;
   toggleAcceptanceCriteria: (issueId: string, criteriaId: string) => void;
   toggleImplementationStep: (stepOrder: number) => void;
   resetState: () => void;
@@ -19,6 +20,9 @@ interface ProjectPlannerContextType extends ProjectPlannerState {
   availableBranches: string[];
   connectToGithub: () => Promise<void>;
   isConnecting: boolean;
+  githubAccessToken: string;
+  setGithubAccessToken: (token: string) => void;
+  error: string | null;
 }
 
 const ProjectPlannerContext = createContext<ProjectPlannerContextType | undefined>(undefined);
@@ -26,9 +30,9 @@ const ProjectPlannerContext = createContext<ProjectPlannerContextType | undefine
 export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, setState] = useState<ProjectPlannerState>({
     transcript: '',
-    technicalTask: mockTechnicalTask,
-    githubIssues: mockGithubIssues,
-    bobPrompt: mockBobPrompt,
+    technicalTask: null,
+    githubIssues: [],
+    bobPrompt: null,
     isProcessing: false,
   });
 
@@ -38,40 +42,166 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
   const [selectedBranch, setSelectedBranch] = useState<string>('');
   const [availableBranches, setAvailableBranches] = useState<string[]>([]);
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
+  const [githubAccessToken, setGithubAccessToken] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
 
   const setTranscript = (transcript: string) => {
     setState(prev => ({ ...prev, transcript }));
   };
 
-  const connectToGithub = async () => {
-    if (!githubRepoUrl.trim()) return;
-    
-    setIsConnecting(true);
-    
-    // Simulate API call to GitHub
-    setTimeout(() => {
-      // Mock branches - in real implementation, fetch from GitHub API
-      const mockBranches = ['main', 'dev', 'staging', 'feature/new-feature'];
-      setAvailableBranches(mockBranches);
-      setSelectedBranch(mockBranches[0]); // Default to first branch
-      setIsGithubConnected(true);
-      setIsConnecting(false);
-    }, 1000);
+  /**
+   * Parse GitHub repository URL to extract owner and repo name
+   */
+  const parseGithubUrl = (url: string): { owner: string; repo: string } | null => {
+    try {
+      // Handle various GitHub URL formats
+      const patterns = [
+        /github\.com\/([^\/]+)\/([^\/]+)/,  // https://github.com/owner/repo
+        /^([^\/]+)\/([^\/]+)$/,              // owner/repo
+      ];
+
+      for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match) {
+          return {
+            owner: match[1],
+            repo: match[2].replace(/\.git$/, ''), // Remove .git suffix if present
+          };
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error('Error parsing GitHub URL:', error);
+      return null;
+    }
   };
 
-  const extractEngineeringIntent = () => {
+  /**
+   * Connect to GitHub repository and fetch branches
+   */
+  const connectToGithub = async () => {
+    if (!githubRepoUrl.trim()) {
+      setError('Please enter a GitHub repository URL');
+      return;
+    }
+
+    if (!githubAccessToken.trim()) {
+      setError('Please provide a GitHub access token');
+      return;
+    }
+
+    setIsConnecting(true);
+    setError(null);
+
+    try {
+      const parsed = parseGithubUrl(githubRepoUrl);
+      if (!parsed) {
+        throw new Error('Invalid GitHub repository URL');
+      }
+
+      const { owner, repo } = parsed;
+
+      // Fetch repository information
+      const repoResponse = await fetch(
+        `${API_BASE_URL}/api/v1/github/repository/${owner}/${repo}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${githubAccessToken}`,
+          },
+        }
+      );
+
+      if (!repoResponse.ok) {
+        const errorData = await repoResponse.json();
+        throw new Error(errorData.error || 'Failed to fetch repository');
+      }
+
+      // Fetch branches
+      const branchesResponse = await fetch(
+        `${API_BASE_URL}/api/v1/github/repository/${owner}/${repo}/branches`,
+        {
+          headers: {
+            'Authorization': `Bearer ${githubAccessToken}`,
+          },
+        }
+      );
+
+      if (!branchesResponse.ok) {
+        const errorData = await branchesResponse.json();
+        throw new Error(errorData.error || 'Failed to fetch branches');
+      }
+
+      const branchesData = await branchesResponse.json();
+      const branches = branchesData.data.map((b: any) => b.name);
+
+      setAvailableBranches(branches);
+      setSelectedBranch(branches[0] || 'main');
+      setIsGithubConnected(true);
+    } catch (error) {
+      console.error('GitHub connection error:', error);
+      setError(error instanceof Error ? error.message : 'Failed to connect to GitHub');
+      setIsGithubConnected(false);
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  /**
+   * Extract engineering intent with optional GitHub context
+   */
+  const extractEngineeringIntent = async () => {
+    if (!state.transcript.trim()) {
+      setError('Please enter a transcript');
+      return;
+    }
+
     setState(prev => ({ ...prev, isProcessing: true }));
-    
-    // Simulate processing delay
-    setTimeout(() => {
+    setError(null);
+
+    try {
+      const parsed = isGithubConnected ? parseGithubUrl(githubRepoUrl) : null;
+
+      const requestBody: any = {
+        transcript: state.transcript,
+      };
+
+      // Add GitHub context if connected
+      if (parsed && isGithubConnected && githubAccessToken) {
+        requestBody.repository = {
+          owner: parsed.owner,
+          name: parsed.repo,
+          branch: selectedBranch,
+          token: githubAccessToken,
+        };
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/v1/planner/analyze`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to analyze transcript');
+      }
+
+      const data = await response.json();
+
       setState(prev => ({
         ...prev,
-        technicalTask: mockTechnicalTask,
-        githubIssues: mockGithubIssues,
-        bobPrompt: mockBobPrompt,
+        technicalTask: data.data.technicalTask,
+        githubIssues: data.data.githubIssues,
+        bobPrompt: data.data.bobPrompt,
         isProcessing: false,
       }));
-    }, 1500);
+    } catch (error) {
+      console.error('Intent extraction error:', error);
+      setError(error instanceof Error ? error.message : 'Failed to extract engineering intent');
+      setState(prev => ({ ...prev, isProcessing: false }));
+    }
   };
 
   const toggleAcceptanceCriteria = (issueId: string, criteriaId: string) => {
@@ -112,6 +242,7 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
       bobPrompt: null,
       isProcessing: false,
     });
+    setError(null);
   };
 
   return (
@@ -134,6 +265,9 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
         availableBranches,
         connectToGithub,
         isConnecting,
+        githubAccessToken,
+        setGithubAccessToken,
+        error,
       }}
     >
       {children}
