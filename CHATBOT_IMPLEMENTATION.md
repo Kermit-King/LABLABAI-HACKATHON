@@ -7,7 +7,7 @@
 
 ## Overview
 
-A context-aware chatbot has been successfully integrated into NATS (Notes-to-Action Task Synthesizer). The chatbot uses the meeting transcript and AI-generated outputs (System Blueprint, GitHub Issues, Bob Console prompts) as its knowledge base to answer follow-up questions.
+A context-aware chatbot has been successfully integrated into NATS (Notes-to-Action Task Synthesizer). The chatbot uses the meeting transcript and AI-generated outputs (System Blueprint, GitHub Issues, NATS Console prompts) as its knowledge base to answer follow-up questions.
 
 ---
 
@@ -73,7 +73,7 @@ A context-aware chatbot has been successfully integrated into NATS (Notes-to-Act
 - Meeting Transcript
 - System Blueprint (tasks, files, steps)
 - GitHub Issues (with acceptance criteria)
-- Bob Console Prompts (implementation guide)
+- NATS Console Prompts (implementation guide)
 ```
 
 **API Parameters:**
@@ -141,7 +141,7 @@ A context-aware chatbot has been successfully integrated into NATS (Notes-to-Act
 - Current transcript
 - System Blueprint (if analyzed)
 - GitHub Issues (if generated)
-- Bob Console Prompts (if generated)
+- NATS Console Prompts (if generated)
 - Chat history (last 5 messages)
 
 #### 3. App Integration (`nats-planner/src/App.tsx`)
@@ -175,14 +175,14 @@ See GitHub Issue #1 for detailed acceptance criteria."
 
 **User:** "How do I implement the JWT token generation?"
 
-**Bot:** "According to the Bob Console prompt for Step 1:
+**Bot:** "According to the NATS Console prompt for Step 1:
 1. Install `jsonwebtoken` package
 2. Create a secret key in your `.env` file
 3. In `src/auth/login.ts`, import jwt and use:
 ```typescript
 const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
 ```
-See the full implementation details in the Bob Console tab."
+See the full implementation details in the NATS Console tab."
 
 ---
 

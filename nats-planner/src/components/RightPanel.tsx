@@ -1,9 +1,9 @@
 import React from 'react';
 import { MessageSquare } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
 import { SystemBlueprint } from './SystemBlueprint';
 import { GithubIssuesView } from './GithubIssuesView';
-import { BobConsole } from './BobConsole';
+import { NatsConsole } from './NatsConsole';
 import { ChatTab } from './ChatTab';
 
 export const RightPanel: React.FC = () => {
@@ -13,7 +13,7 @@ export const RightPanel: React.FC = () => {
         <TabsList className="w-full justify-start overflow-x-auto flex-nowrap">
           <TabsTrigger value="blueprint">System Blueprint</TabsTrigger>
           <TabsTrigger value="issues">GitHub Issues</TabsTrigger>
-          <TabsTrigger value="bob">Bob Console</TabsTrigger>
+          <TabsTrigger value="nats">NATS Console</TabsTrigger>
           <TabsTrigger value="chat" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
             AI Chat
@@ -29,8 +29,8 @@ export const RightPanel: React.FC = () => {
             <GithubIssuesView />
           </TabsContent>
           
-          <TabsContent value="bob" className="w-full">
-            <BobConsole />
+          <TabsContent value="nats" className="w-full">
+            <NatsConsole />
           </TabsContent>
 
           <TabsContent value="chat" className="w-full h-[600px]">
@@ -42,4 +42,4 @@ export const RightPanel: React.FC = () => {
   );
 };
 
-// Made with Bob
+// Made with NATS

@@ -1,6 +1,6 @@
 # 🎯 NATS: Notes-to-Action Task Synthesizer
 
-AI-Powered Engineering Intent Orchestration - Transform meeting transcripts and notes into highly structured, context-aware engineering instructions designed for IBM Bob autonomous codebase modification.
+AI-Powered Engineering Intent Orchestration - Transform meeting transcripts and notes into highly structured, context-aware engineering instructions designed for NATS autonomous codebase modification.
 
 ## 🚀 Quick Start
 
@@ -168,7 +168,7 @@ Open your browser to: `http://localhost:5173`
 - **Transcript Processing**: Paste raw meeting notes and extract engineering intent
 - **System Blueprint**: Visual breakdown of technical tasks with risk assessment
 - **GitHub Issues Generator**: Auto-generate structured issues with acceptance criteria
-- **Bob Orchestrator Console**: Complete, ready-to-use prompts for IBM Bob
+- **NATS Orchestrator Console**: Complete, ready-to-use prompts for NATS
 - **Interactive UI**: Check off tasks, copy file paths, and manage implementation order
 - **Dark Mode First**: Sleek developer aesthetic
 
@@ -223,7 +223,7 @@ curl -X POST http://localhost:3001/api/v1/planner/analyze \
 1. Open `http://localhost:5173` in your browser
 2. Paste a transcript in the left panel
 3. Click "Extract Engineering Intent"
-4. Review the generated blueprint, issues, and Bob prompts
+4. Review the generated blueprint, issues, and NATS prompts
 
 ---
 
@@ -301,8 +301,8 @@ npm run lint     # Lint TypeScript/React code
 4. **Extract Intent**: Click "Extract Engineering Intent" button
 5. **Review Blueprint**: Check system overview, affected files, and implementation order
 6. **View Issues**: See generated GitHub issues with acceptance criteria
-7. **Copy for Bob**: Get the complete prompt ready for IBM Bob
-8. **Execute**: Use the generated instructions with IBM Bob for autonomous code modification
+7. **Copy for NATS**: Get the complete prompt ready for NATS
+8. **Execute**: Use the generated instructions with NATS for autonomous code modification
 
 ---
 

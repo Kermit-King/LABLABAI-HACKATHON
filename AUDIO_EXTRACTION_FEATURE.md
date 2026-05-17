@@ -21,7 +21,7 @@ Audio File Upload → Fireworks AI Transcription → Watsonx.ai Analysis → Com
    - Transcript text
    - System blueprint (technical tasks)
    - GitHub issues
-   - Bob prompt
+   - NATS prompt
 
 ## API Endpoint
 
@@ -204,7 +204,7 @@ Expected response:
    - Accurate transcript
    - Relevant technical tasks
    - GitHub issues
-   - Bob prompt
+   - NATS prompt
 
 ## Performance
 

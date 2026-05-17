@@ -1,13 +1,13 @@
 # NATS Architecture & Feature Planner
 
-Notes-to-Action Task Synthesizer - A sophisticated web application that transforms meeting transcripts and notes into highly structured, context-aware engineering instructions designed for IBM Bob autonomous codebase modification.
+Notes-to-Action Task Synthesizer - A sophisticated web application that transforms meeting transcripts and notes into highly structured, context-aware engineering instructions designed for NATS autonomous codebase modification.
 
 ## 🚀 Features
 
 - **Transcript Processing**: Paste raw meeting notes and extract engineering intent
 - **System Blueprint**: Visual breakdown of technical tasks with risk assessment
 - **GitHub Issues Generator**: Auto-generate structured issues with acceptance criteria
-- **Bob Orchestrator Console**: Complete, ready-to-use prompts for IBM Bob
+- **NATS Orchestrator Console**: Complete, ready-to-use prompts for NATS
 - **Interactive Chatbot**: AI assistant for project planning and architecture discussions
 - **GitHub Integration**: OAuth authentication and direct issue creation
 - **Interactive UI**: Check off tasks, copy file paths, and manage implementation order
@@ -102,7 +102,7 @@ nats-planner/
 │   │   │   ├── tooltip.tsx          # Tooltip component
 │   │   │   ├── ThemeToggle.tsx      # Theme toggle component
 │   │   │   └── Toast.tsx            # Toast notification
-│   │   ├── BobConsole.tsx           # Bob prompt generator
+│   │   ├── NatsConsole.tsx          # NATS prompt generator
 │   │   ├── ChatMessage.tsx          # Chat message component
 │   │   ├── ChatTab.tsx              # Chat tab interface
 │   │   ├── GithubIssuesView.tsx     # GitHub issues display
@@ -155,14 +155,14 @@ Ensure both backend and frontend are running:
 Navigate through the tabs:
 - **📋 System Blueprint**: Overview, risk assessment, affected files
 - **🐙 GitHub Issues**: Auto-generated issues with acceptance criteria
-- **🤖 Bob Console**: Complete prompts ready for IBM Bob
+- **🤖 NATS Console**: Complete prompts ready for NATS
 - **💬 Chatbot**: Interactive AI assistant for clarifications
 
 ### 5. Take Action
 - ✅ Check off completed tasks
 - 📋 Copy file paths and code snippets
 - 🐙 Create GitHub issues directly (with OAuth)
-- 🤖 Copy Bob prompts for autonomous code modification
+- 🤖 Copy NATS prompts for autonomous code modification
 
 ## 🔧 Development Commands
 
@@ -238,10 +238,10 @@ All UI components follow the shadcn/ui pattern with Radix UI primitives:
 
 ### Feature Components
 - **LeftPanel.tsx** - Transcript input and GitHub integration
-- **RightPanel.tsx** - Tabbed workspace (Blueprint, Issues, Bob Console, Chat)
+- **RightPanel.tsx** - Tabbed workspace (Blueprint, Issues, NATS Console, Chat)
 - **SystemBlueprint.tsx** - Technical task breakdown with risk assessment
 - **GithubIssuesView.tsx** - GitHub issues display and management
-- **BobConsole.tsx** - IBM Bob prompt generator
+- **NatsConsole.tsx** - NATS prompt generator
 - **ChatTab.tsx** - AI chatbot interface
 - **ChatMessage.tsx** - Chat message with syntax highlighting
 

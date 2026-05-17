@@ -7,7 +7,7 @@ import { useToast } from './ui/Toast';
 import { copyToClipboard } from '../lib/utils';
 import { Skeleton } from './ui/skeleton';
 
-export const BobConsole: React.FC = () => {
+export const NatsConsole: React.FC = () => {
   const { bobPrompt, isProcessing } = useProjectPlanner();
   const { showToast } = useToast();
 
@@ -38,7 +38,7 @@ export const BobConsole: React.FC = () => {
         <Terminal className="h-10 w-10 text-muted-foreground" />
         <h3 className="text-sm font-medium text-foreground">Nothing to send yet</h3>
         <p className="text-xs text-muted-foreground max-w-sm">
-          Once extraction runs, the full Bob-ready prompt will appear here.
+          Once extraction runs, the full NATS-ready prompt will appear here.
         </p>
       </div>
     );
@@ -57,7 +57,7 @@ ${bobPrompt.additionalNotes}`;
   const handleCopyPrompt = async () => {
     try {
       await copyToClipboard(fullPrompt);
-      showToast('Prompt copied to clipboard! Ready for IBM Bob.', 'success');
+      showToast('Prompt copied to clipboard! Ready for NATS.', 'success');
     } catch (error) {
       showToast('Failed to copy prompt', 'error');
     }
@@ -79,15 +79,15 @@ ${bobPrompt.additionalNotes}`;
             <div className="space-y-1">
               <CardTitle className="flex items-center gap-2">
                 <Bot className="h-5 w-5 text-primary" />
-                IBM Bob Orchestrator Prompt
+                NATS Orchestrator Prompt
               </CardTitle>
               <CardDescription>
-                Complete, structured instructions ready to be passed to IBM Bob for autonomous execution
+                Complete, structured instructions ready to be passed to NATS for autonomous execution
               </CardDescription>
             </div>
             <Button onClick={handleCopyPrompt} className="shrink-0 w-full sm:w-auto">
               <Copy className="mr-2 h-4 w-4" />
-              Copy for Bob
+              Copy for NATS
             </Button>
           </div>
         </CardHeader>
@@ -138,4 +138,4 @@ ${bobPrompt.additionalNotes}`;
   );
 };
 
-// Made with Bob
+// Made with NATS

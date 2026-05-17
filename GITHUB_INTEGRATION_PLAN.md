@@ -15,7 +15,7 @@ This plan outlines the implementation of GitHub repository integration that will
 3. Enhance AI analysis with codebase context
 4. Generate GitHub-aware System Blueprints
 5. Create actionable GitHub Issues
-6. Produce IBM Bob Console prompts for implementation
+6. Produce NATS Console prompts for implementation
 
 ---
 
@@ -286,9 +286,9 @@ githubIssues: [
 ]
 ```
 
-### 7. Bob Console Prompt Format
+### 7. NATS Console Prompt Format
 
-**Structure (Following IBM Bob Documentation):**
+**Structure (Following NATS Documentation):**
 
 ```markdown
 # Task: [Title from System Blueprint]
@@ -396,7 +396,7 @@ githubIssues: [
 1. Update Watsonx service to accept repository context
 2. Enhance system prompt with codebase information
 3. Update response schema for GitHub-aware outputs
-4. Implement Bob Console prompt generation
+4. Implement NATS Console prompt generation
 5. Add validation for AI responses with GitHub context
 
 **Files to Modify:**
@@ -593,7 +593,7 @@ VITE_GITHUB_REDIRECT_URI=http://localhost:5173/github/callback
    - ✅ AI generates accurate file mappings (>90% accuracy)
    - ✅ System Blueprint includes real file paths
    - ✅ GitHub Issues reference actual code locations
-   - ✅ Bob Console prompt is actionable
+   - ✅ NATS Console prompt is actionable
 
 2. **Performance:**
    - Repository connection: < 2 seconds

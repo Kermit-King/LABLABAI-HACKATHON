@@ -148,7 +148,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ content, role, timesta
               {/* Header with role and timestamp */}
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                  {role === 'user' ? 'You' : 'Bob'}
+                  {role === 'user' ? 'You' : 'NATS'}
                 </span>
                 <span className="text-xs text-zinc-400 dark:text-zinc-500">
                   {timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -277,4 +277,4 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ content, role, timesta
   );
 };
 
-// Made with Bob
+// Made with NATS

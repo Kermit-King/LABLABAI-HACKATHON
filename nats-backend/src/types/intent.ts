@@ -117,7 +117,7 @@ export interface TechnicalTask {
 }
 
 /**
- * Represents the structured prompt for IBM Bob
+ * Represents the structured prompt for NATS
  */
 export interface BobPrompt {
   systemContext: string;

@@ -1,7 +1,7 @@
 # NATS Planner - UI/UX Enhancement Handoff Document
 
-**Date:** 2026-05-16  
-**Developer:** Bob (AI Assistant)  
+**Date:** 2026-05-16
+**Developer:** NATS (AI Assistant)
 **Project:** NATS Architecture & Feature Planner
 
 ---
@@ -411,8 +411,8 @@ For questions about these changes:
 
 # GitHub Integration Feature - Implementation Handoff
 
-**Date:** 2026-05-16  
-**Developer:** Bob (AI Assistant)  
+**Date:** 2026-05-16
+**Developer:** NATS (AI Assistant)
 **Feature:** GitHub Repository Integration with AI-Powered Codebase Analysis
 
 ---
@@ -425,7 +425,7 @@ This document details the implementation of GitHub repository integration that e
 3. Map meeting transcripts to actual codebase files
 4. Generate GitHub-aware System Blueprints with real file paths
 5. Create actionable GitHub Issues with code references
-6. Produce IBM Bob Console prompts with implementation context
+6. Produce NATS Console prompts with implementation context
 
 ---
 
@@ -661,7 +661,7 @@ TRANSCRIPT:
 }
 ```
 
-### 6. Bob Console Prompt Format
+### 6. NATS Console Prompt Format
 
 **Structure:**
 ```markdown
@@ -847,7 +847,7 @@ npm run dev
 4. **Review Outputs:**
    - **System Blueprint:** Real file paths, implementation order
    - **GitHub Issues:** Code references, affected files
-   - **Bob Console:** Copy prompt for IBM Bob
+   - **NATS Console:** Copy prompt for NATS
 
 ### Advanced Features
 
@@ -921,7 +921,7 @@ npm run dev
 - [ ] AI generates real file paths
 - [ ] System Blueprint shows repository info
 - [ ] GitHub Issues include code references
-- [ ] Bob Console prompt includes context
+- [ ] NATS Console prompt includes context
 
 ---
 

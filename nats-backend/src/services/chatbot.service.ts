@@ -73,7 +73,7 @@ IMPORTANT RULES:
 2. If information is not in the context, clearly state "I don't have that information in the current context"
 3. Be concise, technical, and helpful
 4. Reference specific sections when answering (e.g., "According to the System Blueprint..." or "In GitHub Issue #2...")
-5. If asked about implementation details, refer to the Bob Console prompts
+5. If asked about implementation details, refer to the NATS Console prompts
 6. When providing code examples, ALWAYS wrap them in markdown code blocks with the language specified:
    \`\`\`typescript
    your code here
@@ -133,9 +133,9 @@ AVAILABLE CONTEXT:
       });
     }
 
-    // Add Bob Console Prompts
+    // Add NATS Console Prompts
     if (context.bobPrompt) {
-      prompt += `\n## Bob Console Implementation Guide:\n`;
+      prompt += `\n## NATS Console Implementation Guide:\n`;
       prompt += `System Context:\n${context.bobPrompt.systemContext}\n\n`;
       prompt += `Task Breakdown:\n${context.bobPrompt.taskBreakdown}\n\n`;
       prompt += `File Instructions:\n${context.bobPrompt.fileInstructions}\n\n`;
