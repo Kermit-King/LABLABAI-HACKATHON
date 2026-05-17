@@ -11,6 +11,22 @@ interface ChatMessage {
   timestamp: Date;
 }
 
+interface PersistedState {
+  // Main state
+  transcript: string;
+  technicalTask: any;
+  githubIssues: any[];
+  bobPrompt: any;
+  // GitHub connection
+  githubRepoUrl: string;
+  isGithubConnected: boolean;
+  selectedBranch: string;
+  availableBranches: string[];
+  githubAccessToken: string;
+  // Chat history
+  chatMessages: ChatMessage[];
+}
+
 interface ProjectPlannerContextType extends ProjectPlannerState {
   setTranscript: (transcript: string) => void;
   extractEngineeringIntent: () => Promise<void>;
@@ -54,11 +70,19 @@ const ProjectPlannerContext = createContext<ProjectPlannerContextType | undefine
 
 export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Load initial state from localStorage
-  const loadPersistedState = (): ProjectPlannerState => {
+  const loadPersistedState = (): PersistedState => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        // Convert timestamp strings back to Date objects for chat messages
+        if (parsed.chatMessages) {
+          parsed.chatMessages = parsed.chatMessages.map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp),
+          }));
+        }
+        return parsed;
       }
     } catch (error) {
       console.error('Error loading persisted state:', error);
@@ -68,24 +92,37 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
       technicalTask: null,
       githubIssues: [],
       bobPrompt: null,
-      isProcessing: false,
+      githubRepoUrl: '',
+      isGithubConnected: false,
+      selectedBranch: '',
+      availableBranches: [],
+      githubAccessToken: '',
+      chatMessages: [],
     };
   };
 
-  const [state, setState] = useState<ProjectPlannerState>(loadPersistedState);
+  const persistedState = loadPersistedState();
 
-  const [githubRepoUrl, setGithubRepoUrl] = useState<string>('');
+  const [state, setState] = useState<ProjectPlannerState>({
+    transcript: persistedState.transcript,
+    technicalTask: persistedState.technicalTask,
+    githubIssues: persistedState.githubIssues,
+    bobPrompt: persistedState.bobPrompt,
+    isProcessing: false,
+  });
+
+  const [githubRepoUrl, setGithubRepoUrl] = useState<string>(persistedState.githubRepoUrl);
   const [audioFile, setAudioFile] = useState<File | null>(null);
-  const [isGithubConnected, setIsGithubConnected] = useState<boolean>(false);
-  const [selectedBranch, setSelectedBranch] = useState<string>('');
-  const [availableBranches, setAvailableBranches] = useState<string[]>([]);
+  const [isGithubConnected, setIsGithubConnected] = useState<boolean>(persistedState.isGithubConnected);
+  const [selectedBranch, setSelectedBranch] = useState<string>(persistedState.selectedBranch);
+  const [availableBranches, setAvailableBranches] = useState<string[]>(persistedState.availableBranches);
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
-  const [githubAccessToken, setGithubAccessToken] = useState<string>('');
+  const [githubAccessToken, setGithubAccessToken] = useState<string>(persistedState.githubAccessToken);
   const [error, setError] = useState<string | null>(null);
   const [isTranscribing, setIsTranscribing] = useState<boolean>(false);
 
   // Chatbot state
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(persistedState.chatMessages);
   const [isChatLoading, setIsChatLoading] = useState<boolean>(false);
   const [isChatPanelOpen, setIsChatPanelOpen] = useState<boolean>(true); // Default to panel mode
   const [isChatPopout, setIsChatPopout] = useState<boolean>(false); // Default to panel, not popout
@@ -94,11 +131,23 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
   // Persist state to localStorage whenever it changes
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      const dataToStore: PersistedState = {
+        transcript: state.transcript,
+        technicalTask: state.technicalTask,
+        githubIssues: state.githubIssues,
+        bobPrompt: state.bobPrompt,
+        githubRepoUrl,
+        isGithubConnected,
+        selectedBranch,
+        availableBranches,
+        githubAccessToken,
+        chatMessages,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToStore));
     } catch (error) {
       console.error('Error persisting state:', error);
     }
-  }, [state]);
+  }, [state, githubRepoUrl, isGithubConnected, selectedBranch, availableBranches, githubAccessToken, chatMessages]);
 
   const setTranscript = (transcript: string) => {
     setState(prev => ({ ...prev, transcript }));

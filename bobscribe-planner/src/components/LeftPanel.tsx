@@ -109,7 +109,7 @@ export const LeftPanel: React.FC = () => {
           <div className="flex gap-2">
             <Button
               onClick={connectToGithub}
-              disabled={!githubRepoUrl.trim() || !githubAccessToken.trim() || isGithubConnected || isConnecting}
+              disabled={!githubRepoUrl?.trim() || !githubAccessToken?.trim() || isGithubConnected || isConnecting}
               className={isGithubConnected ? 'bg-green-600 hover:bg-green-700 flex-1' : 'flex-1'}
               size="sm"
             >
