@@ -1,8 +1,9 @@
 import React, { useRef, useEffect } from 'react';
-import { Sparkles, Github, Upload, Check, GitBranch } from 'lucide-react';
+import { Sparkles, Github, Upload, Check, GitBranch, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useProjectPlanner } from '../context/ProjectPlannerContext';
 
 export const LeftPanel: React.FC = () => {
@@ -60,7 +61,11 @@ export const LeftPanel: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-3 px-4 lg:px-6">
           <div className="space-y-2">
+            <label htmlFor="github-repo" className="text-xs font-medium text-muted-foreground">
+              Repository URL
+            </label>
             <input
+              id="github-repo"
               type="text"
               value={githubRepoUrl}
               onChange={(e) => setGithubRepoUrl(e.target.value)}
@@ -68,14 +73,38 @@ export const LeftPanel: React.FC = () => {
               disabled={isGithubConnected}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             />
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label htmlFor="github-token" className="text-xs font-medium text-muted-foreground">
+                Personal Access Token
+              </label>
+              <a
+                href="https://github.com/settings/tokens/new?scopes=repo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-primary hover:underline flex items-center gap-1"
+              >
+                Get token
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
             <input
+              id="github-token"
               type="password"
               value={githubAccessToken}
               onChange={(e) => setGithubAccessToken(e.target.value)}
-              placeholder="GitHub Personal Access Token (ghp_...)"
+              placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
               disabled={isGithubConnected}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             />
+            <p className="text-xs text-muted-foreground">
+              💡 Create a token with <code className="px-1 py-0.5 rounded bg-muted">repo</code> scope at GitHub Settings → Developer settings → Personal access tokens
+            </p>
+          </div>
+          
+          <div>
             <Button
               onClick={connectToGithub}
               disabled={!githubRepoUrl.trim() || !githubAccessToken.trim() || isGithubConnected || isConnecting}
@@ -106,24 +135,26 @@ export const LeftPanel: React.FC = () => {
 
           {/* Branch Selector - Only shown when connected */}
           {isGithubConnected && (
-            <div className="space-y-2 pt-2 border-t border-border">
-              <label htmlFor="branch-select" className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <div className="space-y-2 pt-3 border-t border-border">
+              <label className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
                 <GitBranch className="h-3.5 w-3.5 text-primary" />
-                Select Branch
+                Target Branch
               </label>
-              <select
-                id="branch-select"
-                value={selectedBranch}
-                onChange={(e) => setSelectedBranch(e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                aria-label="Select Git branch"
-              >
-                {availableBranches.map((branch) => (
-                  <option key={branch} value={branch}>
-                    {branch}
-                  </option>
-                ))}
-              </select>
+              <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a branch" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableBranches.map((branch) => (
+                    <SelectItem key={branch} value={branch}>
+                      <div className="flex items-center gap-2">
+                        <GitBranch className="h-3.5 w-3.5 text-muted-foreground" />
+                        {branch}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
         </CardContent>
