@@ -36,7 +36,6 @@ async function bootstrap() {
       'http://localhost:3000', // Alternative frontend port
 <<<<<<< Updated upstream
       'https://nats-backend.onrender.com', // Render.com domain
-      'https://*.vercel.app', // Vercel domain
 
 =======
       'http://localhost:3001', // Alternative frontend port
