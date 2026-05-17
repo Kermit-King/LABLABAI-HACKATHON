@@ -41,9 +41,7 @@ class ChatbotService {
     this.modelId = env.WATSONX_MODEL_ID;
   }
 
-  /**
-   * Generate IAM token for Watsonx.ai authentication
-   */
+ 
   private async getAccessToken(): Promise<string> {
     const tokenUrl = 'https://iam.cloud.ibm.com/identity/token';
     
@@ -66,9 +64,7 @@ class ChatbotService {
     return data.access_token;
   }
 
-  /**
-   * Build context-aware system prompt
-   */
+ 
   private buildSystemPrompt(context: ChatContext): string {
     let prompt = `You are a helpful AI assistant for the BobScribe project planning tool. Your role is to answer questions about the analyzed meeting transcript and generated outputs.
 
@@ -154,9 +150,7 @@ AVAILABLE CONTEXT:
     return prompt;
   }
 
-  /**
-   * Build conversation messages for API
-   */
+  
   private buildMessages(systemPrompt: string, question: string, chatHistory?: ChatMessage[]): any[] {
     const messages: any[] = [
       {
