@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { Button } from './button';
+import { Button } from './Button';
 
 type Theme = 'light' | 'dark';
 
