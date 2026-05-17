@@ -1,11 +1,11 @@
 import React from 'react';
 import { Bot, Copy, FileText, Terminal } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/Card';
-import { Button } from './ui/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
 import { useProjectPlanner } from '../context/ProjectPlannerContext';
 import { useToast } from './ui/Toast';
 import { copyToClipboard } from '../lib/utils';
-import { SkeletonBlock } from './ui/SkeletonBlock';
+import { Skeleton } from './ui/skeleton';
 
 export const BobConsole: React.FC = () => {
   const { bobPrompt, isProcessing } = useProjectPlanner();
@@ -17,13 +17,13 @@ export const BobConsole: React.FC = () => {
       <div className="space-y-4">
         <Card>
           <CardHeader>
-            <SkeletonBlock width="w-32" height="h-3" className="mb-2" />
-            <SkeletonBlock width="w-full" height="h-3" />
+            <Skeleton className="w-32 h-3 mb-2" />
+            <Skeleton className="w-full h-3" />
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <SkeletonBlock width="w-32" height="h-3" />
-              <SkeletonBlock width="w-full" height="h-48" rounded="rounded-lg" />
+              <Skeleton className="w-32 h-3" />
+              <Skeleton className="w-full h-48 rounded-lg" />
             </div>
           </CardContent>
         </Card>
@@ -34,10 +34,10 @@ export const BobConsole: React.FC = () => {
   // Empty state
   if (!bobPrompt) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-3 py-12">
-        <Terminal className="h-10 w-10 text-slate-500" />
-        <h3 className="text-sm font-medium text-slate-300">Nothing to send yet</h3>
-        <p className="text-xs text-slate-500 text-center max-w-sm">
+      <div className="flex flex-col items-center justify-center h-full gap-3 py-12 text-center px-6">
+        <Terminal className="h-10 w-10 text-muted-foreground" />
+        <h3 className="text-sm font-medium text-foreground">Nothing to send yet</h3>
+        <p className="text-xs text-muted-foreground max-w-sm">
           Once extraction runs, the full Bob-ready prompt will appear here.
         </p>
       </div>

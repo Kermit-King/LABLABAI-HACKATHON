@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { Button } from './Button';
+import { Button } from './button';
 
 type Theme = 'light' | 'dark';
 
@@ -51,13 +51,13 @@ export const ThemeToggle: React.FC = () => {
       variant="ghost"
       size="icon"
       onClick={toggleTheme}
-      className="rounded-full"
+      className="h-8 w-8 p-1.5 shrink-0 rounded-full"
       aria-label="Toggle theme"
     >
       {theme === 'dark' ? (
-        <Sun className="h-5 w-5 text-amber-400" />
+        <Sun className="h-4 w-4 text-amber-400" />
       ) : (
-        <Moon className="h-5 w-5 text-slate-700" />
+        <Moon className="h-4 w-4 text-slate-700" />
       )}
     </Button>
   );

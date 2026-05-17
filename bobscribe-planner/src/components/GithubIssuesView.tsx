@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { GitBranch, CheckSquare, Square, Download, GitPullRequest, Clipboard, Check } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
-import { Badge } from './ui/Badge';
-import { Button } from './ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
 import { useProjectPlanner } from '../context/ProjectPlannerContext';
 import { useToast } from './ui/Toast';
 import { getPriorityColor, githubIssueToMarkdown, downloadMarkdown } from '../lib/utils';
-import { SkeletonBlock } from './ui/SkeletonBlock';
+import { Skeleton } from './ui/skeleton';
 
 export const GithubIssuesView: React.FC = () => {
   const { githubIssues, toggleAcceptanceCriteria, isProcessing } = useProjectPlanner();
@@ -18,7 +18,7 @@ export const GithubIssuesView: React.FC = () => {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <SkeletonBlock key={i} width="w-full" height="h-28" rounded="rounded-lg" />
+          <Skeleton key={i} className="w-full h-28 rounded-lg" />
         ))}
       </div>
     );
@@ -27,10 +27,10 @@ export const GithubIssuesView: React.FC = () => {
   // Empty state
   if (githubIssues.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-3 py-12">
-        <GitPullRequest className="h-10 w-10 text-slate-500" />
-        <h3 className="text-sm font-medium text-slate-300">No issues generated</h3>
-        <p className="text-xs text-slate-500 text-center max-w-sm">
+      <div className="flex flex-col items-center justify-center h-full gap-3 py-12 text-center px-6">
+        <GitPullRequest className="h-10 w-10 text-muted-foreground" />
+        <h3 className="text-sm font-medium text-foreground">No issues generated</h3>
+        <p className="text-xs text-muted-foreground max-w-sm">
           Run extraction to auto-generate structured GitHub issues from your transcript.
         </p>
       </div>

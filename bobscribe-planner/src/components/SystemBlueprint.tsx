@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { AlertTriangle, CheckCircle2, Copy, FileCode, Download, FileText, Clipboard, Check } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/Card';
-import { Badge } from './ui/Badge';
-import { Button } from './ui/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
 import { useProjectPlanner } from '../context/ProjectPlannerContext';
 import { useToast } from './ui/Toast';
 import { getRiskColor, copyToClipboard, technicalTaskToMarkdown, downloadMarkdown } from '../lib/utils';
-import { SkeletonBlock } from './ui/SkeletonBlock';
+import { Skeleton } from './ui/skeleton';
 
 export const SystemBlueprint: React.FC = () => {
   const { technicalTask, toggleImplementationStep, isProcessing } = useProjectPlanner();
@@ -19,21 +19,21 @@ export const SystemBlueprint: React.FC = () => {
       <div className="space-y-4">
         <Card>
           <CardHeader>
-            <SkeletonBlock width="w-48" height="h-4" className="mb-2" />
-            <SkeletonBlock width="w-full" height="h-3" />
+            <Skeleton className="w-48 h-4 mb-2" />
+            <Skeleton className="w-full h-3" />
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <SkeletonBlock width="w-24" height="h-3" />
-              <SkeletonBlock width="w-full" height="h-16" rounded="rounded-lg" />
+              <Skeleton className="w-24 h-3" />
+              <Skeleton className="w-full h-16 rounded-lg" />
             </div>
             <div className="space-y-2">
-              <SkeletonBlock width="w-24" height="h-3" />
-              <SkeletonBlock width="w-full" height="h-16" rounded="rounded-lg" />
+              <Skeleton className="w-24 h-3" />
+              <Skeleton className="w-full h-16 rounded-lg" />
             </div>
             <div className="space-y-2">
-              <SkeletonBlock width="w-24" height="h-3" />
-              <SkeletonBlock width="w-full" height="h-16" rounded="rounded-lg" />
+              <Skeleton className="w-24 h-3" />
+              <Skeleton className="w-full h-16 rounded-lg" />
             </div>
           </CardContent>
         </Card>
@@ -44,10 +44,10 @@ export const SystemBlueprint: React.FC = () => {
   // Empty state
   if (!technicalTask) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-3 py-12">
-        <FileText className="h-10 w-10 text-slate-500" />
-        <h3 className="text-sm font-medium text-slate-300">No blueprint yet</h3>
-        <p className="text-xs text-slate-500 text-center max-w-sm">
+      <div className="flex flex-col items-center justify-center h-full gap-3 py-12 text-center px-6">
+        <FileText className="h-10 w-10 text-muted-foreground" />
+        <h3 className="text-sm font-medium text-foreground">No blueprint yet</h3>
+        <p className="text-xs text-muted-foreground max-w-sm">
           Paste a transcript and extract engineering intent to see the system breakdown here.
         </p>
       </div>

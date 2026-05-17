@@ -16,11 +16,14 @@ A sophisticated web application that transforms meeting transcripts and notes in
 ## 🛠️ Tech Stack
 
 - **Framework**: React 18 + TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS (Dark mode first)
+- **Build Tool**: Vite 6.4.2
+- **Styling**: Tailwind CSS 3.3.6 (Dark mode first)
+- **UI Components**: shadcn/ui (New York style)
+- **Component Library**: Radix UI primitives
 - **Icons**: Lucide React
 - **State Management**: React Context API
 - **Syntax Highlighting**: React Syntax Highlighter
+- **Utilities**: clsx, tailwind-merge, class-variance-authority
 
 ## 📋 Prerequisites
 
@@ -86,28 +89,51 @@ npm run lint
 bobscribe-planner/
 ├── src/
 │   ├── components/
-│   │   ├── ui/              # Reusable UI components
-│   │   ├── LeftPanel.tsx    # Transcript input
-│   │   ├── RightPanel.tsx   # Tabbed workspace
-│   │   ├── SystemBlueprint.tsx
-│   │   ├── GithubIssuesView.tsx
-│   │   └── BobConsole.tsx
+│   │   ├── ui/                      # shadcn/ui components
+│   │   │   ├── badge.tsx            # Badge component
+│   │   │   ├── button.tsx           # Button component
+│   │   │   ├── card.tsx             # Card component
+│   │   │   ├── dialog.tsx           # Dialog component
+│   │   │   ├── scroll-area.tsx      # Scroll area component
+│   │   │   ├── separator.tsx        # Separator component
+│   │   │   ├── skeleton.tsx         # Skeleton loader
+│   │   │   ├── tabs.tsx             # Tabs component
+│   │   │   ├── textarea.tsx         # Textarea component
+│   │   │   ├── tooltip.tsx          # Tooltip component
+│   │   │   ├── ThemeToggle.tsx      # Theme toggle component
+│   │   │   └── Toast.tsx            # Toast notification
+│   │   ├── BobConsole.tsx           # Bob prompt generator
+│   │   ├── ChatMessage.tsx          # Chat message component
+│   │   ├── ChatTab.tsx              # Chat tab interface
+│   │   ├── GithubIssuesView.tsx     # GitHub issues display
+│   │   ├── LeftPanel.tsx            # Transcript input area
+│   │   ├── RightPanel.tsx           # Tabbed workspace
+│   │   └── SystemBlueprint.tsx      # Technical task breakdown
 │   ├── context/
-│   │   └── ProjectPlannerContext.tsx
+│   │   └── ProjectPlannerContext.tsx # Global state management
 │   ├── data/
-│   │   └── mockData.ts      # Sample data
+│   │   └── mockData.ts              # Sample data
 │   ├── lib/
-│   │   └── utils.ts         # Utility functions
+│   │   └── utils.ts                 # Utility functions (cn, colors, markdown)
 │   ├── types/
-│   │   └── index.ts         # TypeScript interfaces
-│   ├── App.tsx
-│   ├── main.tsx
-│   └── index.css
-├── index.html
-├── vite.config.ts
-├── tailwind.config.js
-├── tsconfig.json
-└── package.json
+│   │   └── index.ts                 # TypeScript interfaces
+│   ├── App.tsx                      # Main application component
+│   ├── main.tsx                     # Application entry point
+│   ├── index.css                    # Global styles + Tailwind
+│   └── vite-env.d.ts                # Vite type definitions
+├── .eslintrc.cjs                    # ESLint configuration
+├── .gitignore                       # Git ignore rules
+├── components.json                  # shadcn/ui configuration
+├── HANDOFF.md                       # Project handoff documentation
+├── index.html                       # HTML entry point
+├── package.json                     # Dependencies and scripts
+├── package-lock.json                # Locked dependency versions
+├── postcss.config.js                # PostCSS configuration
+├── README.md                        # This file
+├── tailwind.config.js               # Tailwind CSS configuration
+├── tsconfig.json                    # TypeScript configuration
+├── tsconfig.node.json               # TypeScript config for Node
+└── vite.config.ts                   # Vite build configuration
 ```
 
 ## 🎯 Usage Flow
@@ -195,38 +221,65 @@ npm run dev
 
 ## 📦 Component Architecture
 
-```
-src/
-├── components/
-│   ├── ui/                    # Reusable UI components
-│   │   ├── Button.tsx
-│   │   ├── Card.tsx
-│   │   ├── Badge.tsx
-│   │   ├── Tabs.tsx
-│   │   ├── ThemeToggle.tsx
-│   │   └── Toast.tsx
-│   ├── LeftPanel.tsx          # Transcript input area
-│   ├── RightPanel.tsx         # Tabbed workspace
-│   ├── SystemBlueprint.tsx    # Technical task breakdown
-│   ├── GithubIssuesView.tsx   # GitHub issues display
-│   ├── BobConsole.tsx         # Bob prompt generator
-│   ├── Chatbot.tsx            # AI chatbot interface
-│   └── ChatMessage.tsx        # Chat message component
-├── context/
-│   └── ProjectPlannerContext.tsx  # Global state management
-├── types/
-│   └── index.ts               # TypeScript interfaces
-├── lib/
-│   └── utils.ts               # Utility functions
-└── App.tsx                    # Main application component
-```
+### UI Components (shadcn/ui)
+All UI components follow the shadcn/ui pattern with Radix UI primitives:
+- **button.tsx** - Button with variants (default, destructive, outline, secondary, ghost, link)
+- **card.tsx** - Card container with header, title, description, content, footer
+- **badge.tsx** - Badge with variants (default, secondary, destructive, outline)
+- **tabs.tsx** - Tabs with Radix UI (Tabs, TabsList, TabsTrigger, TabsContent)
+- **dialog.tsx** - Modal dialog component
+- **scroll-area.tsx** - Custom scrollable area
+- **separator.tsx** - Visual separator
+- **skeleton.tsx** - Loading skeleton
+- **textarea.tsx** - Textarea input
+- **tooltip.tsx** - Tooltip component
+- **ThemeToggle.tsx** - Dark/light mode toggle
+- **Toast.tsx** - Toast notification system
 
-## 🎨 Styling
+### Feature Components
+- **LeftPanel.tsx** - Transcript input and GitHub integration
+- **RightPanel.tsx** - Tabbed workspace (Blueprint, Issues, Bob Console, Chat)
+- **SystemBlueprint.tsx** - Technical task breakdown with risk assessment
+- **GithubIssuesView.tsx** - GitHub issues display and management
+- **BobConsole.tsx** - IBM Bob prompt generator
+- **ChatTab.tsx** - AI chatbot interface
+- **ChatMessage.tsx** - Chat message with syntax highlighting
 
-- **Tailwind CSS**: Utility-first CSS framework
+### State Management
+- **ProjectPlannerContext.tsx** - Global state using React Context API
+
+### Utilities
+- **utils.ts** - Helper functions (cn, color utilities, markdown export)
+- **types/index.ts** - TypeScript interfaces and types
+
+## 🎨 Styling & Design System
+
+### shadcn/ui Configuration
+The project uses shadcn/ui components with the following configuration:
+- **Style**: New York (modern, clean aesthetic)
+- **Base Color**: Slate
+- **CSS Variables**: Enabled for theme customization
+- **Path Aliases**: `@/` prefix for clean imports
+
+### Tailwind CSS
+- **Version**: 3.3.6
+- **Utility-first**: CSS framework
 - **Dark Mode**: Default theme with toggle support
 - **Color Palette**: Slate/Zinc base with Indigo accents
 - **Responsive**: Mobile-first design approach
+
+### Component Variants
+Components use `class-variance-authority` for type-safe variant management:
+- Buttons: default, destructive, outline, secondary, ghost, link
+- Badges: default, secondary, destructive, outline
+- Consistent sizing: sm, default, lg, icon
+
+### Adding New Components
+To add more shadcn/ui components:
+```bash
+npx shadcn-ui@latest add [component-name]
+```
+The CLI will use `components.json` to configure the component correctly.
 
 ## 📝 License
 
