@@ -32,7 +32,7 @@ export const ChatTab: React.FC = () => {
 
   // Auto-scroll to bottom
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [chatMessages]);
 
   const hasContext = transcript || technicalTask || githubIssues.length > 0;
