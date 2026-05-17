@@ -10,7 +10,7 @@ export async function githubRoutes(fastify: FastifyInstance) {
    * GET /api/v1/github/oauth/initiate
    * Initiate GitHub OAuth flow
    */
-  fastify.get('/oauth/initiate', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/oauth/initiate', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
       const result = await githubService.initiateOAuth();
       return reply.code(200).send({
@@ -18,7 +18,7 @@ export async function githubRoutes(fastify: FastifyInstance) {
         data: result,
       });
     } catch (error) {
-      fastify.log.error('OAuth initiation error:', error);
+      fastify.log.error({ err: error }, 'OAuth initiation error');
       return reply.code(500).send({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to initiate OAuth',
@@ -49,7 +49,7 @@ export async function githubRoutes(fastify: FastifyInstance) {
         data: result,
       });
     } catch (error) {
-      fastify.log.error('OAuth callback error:', error);
+      fastify.log.error({ err: error }, 'OAuth callback error');
       return reply.code(500).send({
         success: false,
         error: error instanceof Error ? error.message : 'OAuth callback failed',
@@ -80,7 +80,7 @@ export async function githubRoutes(fastify: FastifyInstance) {
         data: { valid: isValid },
       });
     } catch (error) {
-      fastify.log.error('Token validation error:', error);
+      fastify.log.error({ err: error }, 'Token validation error');
       return reply.code(500).send({
         success: false,
         error: 'Token validation failed',
@@ -115,7 +115,7 @@ export async function githubRoutes(fastify: FastifyInstance) {
         data: repository,
       });
     } catch (error) {
-      fastify.log.error('Fetch repository error:', error);
+      fastify.log.error({ err: error }, 'Fetch repository error');
       return reply.code(500).send({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to fetch repository',
@@ -150,7 +150,7 @@ export async function githubRoutes(fastify: FastifyInstance) {
         data: branches,
       });
     } catch (error) {
-      fastify.log.error('Fetch branches error:', error);
+      fastify.log.error({ err: error }, 'Fetch branches error');
       return reply.code(500).send({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to fetch branches',
@@ -190,7 +190,7 @@ export async function githubRoutes(fastify: FastifyInstance) {
       const validation = githubService.validateFileSizes(repositoryMap.relevantFiles);
       
       if (!validation.valid) {
-        fastify.log.warn('File size validation failed:', validation.errors);
+        fastify.log.warn({ errors: validation.errors }, 'File size validation failed');
       }
 
       return reply.code(200).send({
@@ -202,7 +202,7 @@ export async function githubRoutes(fastify: FastifyInstance) {
         },
       });
     } catch (error) {
-      fastify.log.error('Fetch file tree error:', error);
+      fastify.log.error({ err: error }, 'Fetch file tree error');
       return reply.code(500).send({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to fetch file tree',
@@ -246,7 +246,7 @@ export async function githubRoutes(fastify: FastifyInstance) {
         data: fileContent,
       });
     } catch (error) {
-      fastify.log.error('Fetch file content error:', error);
+      fastify.log.error({ err: error }, 'Fetch file content error');
       return reply.code(500).send({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to fetch file content',
@@ -258,7 +258,7 @@ export async function githubRoutes(fastify: FastifyInstance) {
    * GET /api/v1/github/health
    * GitHub service health check
    */
-  fastify.get('/health', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/health', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
       const isHealthy = await githubService.healthCheck();
       return reply.code(isHealthy ? 200 : 503).send({
@@ -267,7 +267,7 @@ export async function githubRoutes(fastify: FastifyInstance) {
         status: isHealthy ? 'healthy' : 'unhealthy',
       });
     } catch (error) {
-      fastify.log.error('GitHub health check error:', error);
+      fastify.log.error({ err: error }, 'GitHub health check error');
       return reply.code(503).send({
         success: false,
         service: 'github',

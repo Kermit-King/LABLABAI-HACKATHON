@@ -96,13 +96,13 @@ class GitHubService {
         throw new Error(`Failed to exchange code for token: ${tokenResponse.statusText}`);
       }
 
-      const tokenData = await tokenResponse.json();
+      const tokenData = await tokenResponse.json() as any;
       
       if (tokenData.error) {
         throw new Error(`OAuth error: ${tokenData.error_description || tokenData.error}`);
       }
 
-      const accessToken = tokenData.access_token;
+      const accessToken = tokenData.access_token as string;
 
       // Fetch user information
       const user = await this.fetchUser(accessToken);
@@ -152,7 +152,7 @@ class GitHubService {
         throw new Error(`Failed to fetch user: ${response.statusText}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
 
       return {
         login: data.login,
@@ -186,7 +186,7 @@ class GitHubService {
         throw new Error(`Failed to fetch repository: ${response.statusText}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
 
       return {
         owner: data.owner.login,
@@ -221,7 +221,7 @@ class GitHubService {
         throw new Error(`Failed to fetch branches: ${response.statusText}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
 
       return data.map((branch: any) => ({
         name: branch.name,
@@ -254,7 +254,7 @@ class GitHubService {
         throw new Error(`Failed to fetch branch reference: ${branchResponse.statusText}`);
       }
 
-      const branchData = await branchResponse.json();
+      const branchData = await branchResponse.json() as any;
       const commitSha = branchData.object.sha;
 
       // Get the commit to find the tree SHA
@@ -269,7 +269,7 @@ class GitHubService {
         throw new Error(`Failed to fetch commit: ${commitResponse.statusText}`);
       }
 
-      const commitData = await commitResponse.json();
+      const commitData = await commitResponse.json() as any;
       const treeSha = commitData.tree.sha;
 
       // Fetch the tree recursively
@@ -284,7 +284,7 @@ class GitHubService {
         throw new Error(`Failed to fetch tree: ${treeResponse.statusText}`);
       }
 
-      const treeData = await treeResponse.json();
+      const treeData = await treeResponse.json() as any;
 
       return treeData.tree.map((item: any) => ({
         path: item.path,
@@ -315,10 +315,10 @@ class GitHubService {
         throw new Error(`Failed to fetch file content: ${response.statusText}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
 
       // Decode base64 content
-      const content = data.encoding === 'base64' 
+      const content = data.encoding === 'base64'
         ? Buffer.from(data.content, 'base64').toString('utf-8')
         : data.content;
 

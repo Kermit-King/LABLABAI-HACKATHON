@@ -82,7 +82,7 @@ export async function plannerRoutes(fastify: FastifyInstance) {
           
           fastify.log.info(`Repository mapped: ${repositoryMap.relevantFiles.length} relevant files found`);
         } catch (error) {
-          fastify.log.warn('Failed to fetch repository context:', error);
+          fastify.log.warn({ err: error }, 'Failed to fetch repository context');
           // Continue without repository context
         }
       }

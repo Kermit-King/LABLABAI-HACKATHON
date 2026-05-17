@@ -4,6 +4,7 @@ import multipart from '@fastify/multipart';
 import { env } from './config/env.js';
 import { plannerRoutes } from './routes/planner.routes.js';
 import { githubRoutes } from './routes/github.routes.js';
+import { chatbotRoutes } from './routes/chatbot.routes.js';
 
 /**
  * Bootstrap the Fastify server
@@ -59,6 +60,7 @@ async function bootstrap() {
   // Register routes
   await fastify.register(plannerRoutes, { prefix: '/api/v1/planner' });
   await fastify.register(githubRoutes, { prefix: '/api/v1/github' });
+  await fastify.register(chatbotRoutes, { prefix: '/api/v1/chatbot' });
 
   // Root health check
   fastify.get('/', async () => {
@@ -92,6 +94,8 @@ async function bootstrap() {
 ║   - GET  /api/v1/github/oauth/initiate                   ║
 ║   - POST /api/v1/github/oauth/callback                   ║
 ║   - GET  /api/v1/github/repository/:owner/:repo          ║
+║   - POST /api/v1/chatbot/ask                             ║
+║   - GET  /api/v1/chatbot/health                          ║
 ║                                                           ║
 ╚═══════════════════════════════════════════════════════════╝
     `);

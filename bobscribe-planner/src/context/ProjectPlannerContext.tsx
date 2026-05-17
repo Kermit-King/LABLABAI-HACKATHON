@@ -3,6 +3,13 @@ import { ProjectPlannerState } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
 interface ProjectPlannerContextType extends ProjectPlannerState {
   setTranscript: (transcript: string) => void;
   extractEngineeringIntent: () => Promise<void>;
@@ -23,6 +30,16 @@ interface ProjectPlannerContextType extends ProjectPlannerState {
   githubAccessToken: string;
   setGithubAccessToken: (token: string) => void;
   error: string | null;
+  // Chatbot
+  chatMessages: ChatMessage[];
+  sendChatMessage: (question: string) => Promise<void>;
+  clearChatHistory: () => void;
+  isChatLoading: boolean;
+  // Chatbot UI state
+  isChatPanelOpen: boolean;
+  setIsChatPanelOpen: (open: boolean) => void;
+  isChatPopout: boolean;
+  setIsChatPopout: (popout: boolean) => void;
 }
 
 const ProjectPlannerContext = createContext<ProjectPlannerContextType | undefined>(undefined);
@@ -44,6 +61,12 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [githubAccessToken, setGithubAccessToken] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+
+  // Chatbot state
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [isChatLoading, setIsChatLoading] = useState<boolean>(false);
+  const [isChatPanelOpen, setIsChatPanelOpen] = useState<boolean>(true); // Default to panel mode
+  const [isChatPopout, setIsChatPopout] = useState<boolean>(false); // Default to panel, not popout
 
   const setTranscript = (transcript: string) => {
     setState(prev => ({ ...prev, transcript }));
@@ -243,6 +266,85 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
       isProcessing: false,
     });
     setError(null);
+    setChatMessages([]);
+  };
+
+  /**
+   * Send a chat message to the chatbot
+   */
+  const sendChatMessage = async (question: string) => {
+    if (!question.trim()) return;
+
+    // Add user message
+    const userMessage: ChatMessage = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: question,
+      timestamp: new Date(),
+    };
+
+    setChatMessages(prev => [...prev, userMessage]);
+    setIsChatLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/chatbot/ask`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question,
+          context: {
+            transcript: state.transcript,
+            systemBlueprint: state.technicalTask,
+            githubIssues: state.githubIssues,
+            bobPrompt: state.bobPrompt,
+          },
+          chatHistory: chatMessages.map(msg => ({
+            role: msg.role,
+            content: msg.content,
+          })),
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to get response');
+      }
+
+      const data = await response.json();
+
+      // Add assistant message
+      const assistantMessage: ChatMessage = {
+        id: `assistant-${Date.now()}`,
+        role: 'assistant',
+        content: data.data.answer,
+        timestamp: new Date(data.data.timestamp),
+      };
+
+      setChatMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      
+      // Add error message
+      const errorMessage: ChatMessage = {
+        id: `error-${Date.now()}`,
+        role: 'assistant',
+        content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
+        timestamp: new Date(),
+      };
+
+      setChatMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsChatLoading(false);
+    }
+  };
+
+  /**
+   * Clear chat history
+   */
+  const clearChatHistory = () => {
+    setChatMessages([]);
   };
 
   return (
@@ -268,6 +370,14 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
         githubAccessToken,
         setGithubAccessToken,
         error,
+        chatMessages,
+        sendChatMessage,
+        clearChatHistory,
+        isChatLoading,
+        isChatPanelOpen,
+        setIsChatPanelOpen,
+        isChatPopout,
+        setIsChatPopout,
       }}
     >
       {children}
