@@ -34,12 +34,8 @@ async function bootstrap() {
       'http://localhost:5173', // Vite dev server (default)
       'http://localhost:5174', // Vite dev server (alternative)
       'http://localhost:3000', // Alternative frontend port
-<<<<<<< Updated upstream
       'https://nats-backend.onrender.com', // Render.com domain
 
-=======
-      'http://localhost:3001', // Alternative frontend port
->>>>>>> Stashed changes
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
