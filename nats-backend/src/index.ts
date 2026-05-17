@@ -24,14 +24,23 @@ async function bootstrap() {
     },
   });
 
-  // Register CORS plugin
+  // Register CORS plugin - Allow both development and production origins
   await fastify.register(cors, {
     origin: [
-      'http://localhost:5173', // Vite dev server
+      // Production origins
+      /\.vercel\.app$/, // Allow all Vercel deployments
+      'https://nats-xi.vercel.app', // Production frontend
+      // Development origins
+      'http://localhost:5173', // Vite dev server (default)
+      'http://localhost:5174', // Vite dev server (alternative)
       'http://localhost:3000', // Alternative frontend port
+<<<<<<< Updated upstream
       'https://nats-backend.onrender.com', // Render.com domain
       'https://*.vercel.app', // Vercel domain
 
+=======
+      'http://localhost:3001', // Alternative frontend port
+>>>>>>> Stashed changes
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
