@@ -39,17 +39,28 @@ export const GithubIssuesView: React.FC = () => {
 
   const handleExportIssue = (issue: typeof githubIssues[0]) => {
     try {
+      // Validate issue data before processing
+      if (!issue || !issue.title || !issue.description) {
+        throw new Error('Invalid issue data');
+      }
+      
       const markdown = githubIssueToMarkdown(issue);
       const slug = issue.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
       downloadMarkdown(markdown, `issue-${slug}.md`);
       showToast(`Issue "${issue.title}" exported to Markdown`, 'success');
     } catch (error) {
+      console.error('Export error:', error);
       showToast('Failed to export issue', 'error');
     }
   };
 
   const handleCopyIssue = async (issue: typeof githubIssues[0]) => {
     try {
+      // Validate issue data before processing
+      if (!issue || !issue.title || !issue.description) {
+        throw new Error('Invalid issue data');
+      }
+      
       const markdown = githubIssueToMarkdown(issue);
       await navigator.clipboard.writeText(markdown);
       setCopyStates(prev => ({ ...prev, [issue.id]: 'success' }));
@@ -57,6 +68,7 @@ export const GithubIssuesView: React.FC = () => {
         setCopyStates(prev => ({ ...prev, [issue.id]: 'idle' }));
       }, 2000);
     } catch (error) {
+      console.error('Copy error:', error);
       setCopyStates(prev => ({ ...prev, [issue.id]: 'error' }));
       setTimeout(() => {
         setCopyStates(prev => ({ ...prev, [issue.id]: 'idle' }));
@@ -66,7 +78,14 @@ export const GithubIssuesView: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {githubIssues.map((issue) => (
+      {githubIssues.map((issue) => {
+        // Safety check: skip rendering if issue data is invalid
+        if (!issue || !issue.id || !issue.title) {
+          console.warn('Skipping invalid issue:', issue);
+          return null;
+        }
+        
+        return (
         <Card key={issue.id} className="hover:border-primary/50 transition-colors">
           <CardHeader className="px-4 py-4 lg:px-6 lg:py-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -76,7 +95,7 @@ export const GithubIssuesView: React.FC = () => {
                   {issue.title}
                 </CardTitle>
                 <div className="flex flex-wrap gap-2">
-                  {issue.tags.map((tag, idx) => (
+                  {issue.tags && Array.isArray(issue.tags) && issue.tags.map((tag, idx) => (
                     <Badge key={idx} variant="secondary" className="text-xs">
                       {tag}
                     </Badge>
@@ -132,11 +151,17 @@ export const GithubIssuesView: React.FC = () => {
             <div>
               <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
                 <CheckSquare className="h-4 w-4 text-green-400" />
-                Acceptance Criteria ({issue.acceptanceCriteria.filter(ac => ac.completed).length}/
-                {issue.acceptanceCriteria.length})
+                Acceptance Criteria ({issue.acceptanceCriteria && Array.isArray(issue.acceptanceCriteria) ? issue.acceptanceCriteria.filter(ac => ac.completed).length : 0}/
+                {issue.acceptanceCriteria && Array.isArray(issue.acceptanceCriteria) ? issue.acceptanceCriteria.length : 0})
               </h4>
               <div className="space-y-2">
-                {issue.acceptanceCriteria.map((criteria) => (
+                {issue.acceptanceCriteria && Array.isArray(issue.acceptanceCriteria) && issue.acceptanceCriteria.map((criteria) => {
+                  // Safety check for criteria
+                  if (!criteria || !criteria.id) {
+                    return null;
+                  }
+                  
+                  return (
                   <button
                     key={criteria.id}
                     onClick={() => toggleAcceptanceCriteria(issue.id, criteria.id)}
@@ -157,12 +182,14 @@ export const GithubIssuesView: React.FC = () => {
                       {criteria.description}
                     </span>
                   </button>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </CardContent>
         </Card>
-      ))}
+        );
+      })}
     </div>
   );
 };

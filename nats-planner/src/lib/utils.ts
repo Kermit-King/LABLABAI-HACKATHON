@@ -59,21 +59,40 @@ export function technicalTaskToMarkdown(task: TechnicalTask): string {
 }
 
 export function githubIssueToMarkdown(issue: GithubIssue): string {
+  // Validate issue data
+  if (!issue || typeof issue !== 'object') {
+    throw new Error('Invalid issue object');
+  }
+  
+  if (!issue.title || typeof issue.title !== 'string') {
+    throw new Error('Issue title is required');
+  }
+  
   let markdown = `# ${issue.title}\n\n`;
   
   markdown += `## Description\n\n`;
-  markdown += `${issue.description}\n\n`;
+  markdown += `${issue.description || 'No description provided'}\n\n`;
   
   markdown += `## Acceptance Criteria\n\n`;
-  issue.acceptanceCriteria.forEach((criteria: AcceptanceCriteria) => {
-    markdown += `- [ ] ${criteria.description}\n`;
-  });
+  if (issue.acceptanceCriteria && Array.isArray(issue.acceptanceCriteria)) {
+    issue.acceptanceCriteria.forEach((criteria: AcceptanceCriteria) => {
+      if (criteria && criteria.description) {
+        markdown += `- [ ] ${criteria.description}\n`;
+      }
+    });
+  } else {
+    markdown += `No acceptance criteria defined\n`;
+  }
   
   markdown += `\n## Labels\n\n`;
-  markdown += issue.tags.join(', ') + '\n\n';
+  if (issue.tags && Array.isArray(issue.tags) && issue.tags.length > 0) {
+    markdown += issue.tags.join(', ') + '\n\n';
+  } else {
+    markdown += `No labels\n\n`;
+  }
   
   markdown += `## Priority\n\n`;
-  markdown += `${issue.priority.toUpperCase()}\n`;
+  markdown += `${issue.priority ? issue.priority.toUpperCase() : 'MEDIUM'}\n`;
   
   return markdown;
 }
