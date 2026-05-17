@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Sparkles, Github, Upload, Check, GitBranch, ExternalLink, X, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/Card';
-import { Button } from './ui/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useProjectPlanner } from '../context/ProjectPlannerContext';

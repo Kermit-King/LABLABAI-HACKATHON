@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { MessageSquare, SendHorizontal, Loader2 } from 'lucide-react';
-import { Button } from './ui/Button';
-import { Card } from './ui/Card';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
 import { Textarea } from './ui/textarea';
 import { ScrollArea } from './ui/scroll-area';
 import { useProjectPlanner } from '../context/ProjectPlannerContext';

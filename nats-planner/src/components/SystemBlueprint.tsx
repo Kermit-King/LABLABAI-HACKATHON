@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { AlertTriangle, CheckCircle2, Copy, FileCode, Download, FileText, Clipboard, Check } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/Card';
-import { Badge } from './ui/Badge';
-import { Button } from './ui/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
 import { useProjectPlanner } from '../context/ProjectPlannerContext';
 import { useToast } from './ui/Toast';
 import { getRiskColor, copyToClipboard, technicalTaskToMarkdown, downloadMarkdown } from '../lib/utils';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { MessageSquare } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { SystemBlueprint } from './SystemBlueprint';
 import { GithubIssuesView } from './GithubIssuesView';
 import { NatsConsole } from './NatsConsole';
