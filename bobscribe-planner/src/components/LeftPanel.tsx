@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { Sparkles, Github, Upload, Check, GitBranch } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
+import { Textarea } from './ui/textarea';
 import { useProjectPlanner } from '../context/ProjectPlannerContext';
 
 export const LeftPanel: React.FC = () => {
@@ -104,14 +105,16 @@ export const LeftPanel: React.FC = () => {
           {/* Branch Selector - Only shown when connected */}
           {isGithubConnected && (
             <div className="space-y-2 pt-2 border-t border-border">
-              <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <label htmlFor="branch-select" className="flex items-center gap-2 text-sm font-medium text-foreground">
                 <GitBranch className="h-3.5 w-3.5 text-primary" />
                 Select Branch
               </label>
               <select
+                id="branch-select"
                 value={selectedBranch}
                 onChange={(e) => setSelectedBranch(e.target.value)}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                aria-label="Select Git branch"
               >
                 {availableBranches.map((branch) => (
                   <option key={branch} value={branch}>
@@ -144,6 +147,8 @@ export const LeftPanel: React.FC = () => {
               accept="audio/*"
               onChange={handleAudioUpload}
               className="hidden"
+              aria-label="Upload audio file"
+              id="audio-upload"
             />
             <Button
               onClick={handleUploadClick}
@@ -170,7 +175,7 @@ export const LeftPanel: React.FC = () => {
             </div>
           </div>
 
-          <textarea
+          <Textarea
             ref={textareaRef}
             value={transcript}
             onChange={(e) => setTranscript(e.target.value)}
@@ -178,7 +183,7 @@ export const LeftPanel: React.FC = () => {
 
 Example:
 'We need to implement a secure logout feature that properly clears cookies and revokes JWT tokens. The current implementation doesn't handle token revocation, which is a security risk. Users should be able to logout from all devices, and we need to ensure that revoked tokens can't be reused.'"
-            className="w-full min-h-40 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+            className="w-full min-h-40 resize-none"
             style={{ overflowY: 'hidden' }}
           />
           

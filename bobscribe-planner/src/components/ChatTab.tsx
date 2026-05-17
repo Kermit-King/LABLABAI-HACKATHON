@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { MessageSquare, SendHorizontal, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
+import { Textarea } from './ui/textarea';
 import { useProjectPlanner } from '../context/ProjectPlannerContext';
 import { ChatMessage as ChatMessageComponent } from './ChatMessage';
 
@@ -106,11 +107,11 @@ export const ChatTab: React.FC = () => {
 
       {/* Input Area */}
       <div className="flex items-end gap-2 px-4 pt-3 pb-4 border-t">
-        <textarea
+        <Textarea
           ref={textareaRef}
           rows={1}
           placeholder={hasContext ? "Ask about the blueprint..." : "Extract intent first..."}
-          className="flex-1 resize-none overflow-hidden rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex-1 resize-none overflow-hidden min-h-[40px]"
           onKeyDown={handleKeyDown}
           onChange={handleChange}
           value={chatInputMessage}
