@@ -86,28 +86,45 @@ npm run lint
 bobscribe-planner/
 ├── src/
 │   ├── components/
-│   │   ├── ui/              # Reusable UI components
-│   │   ├── LeftPanel.tsx    # Transcript input
-│   │   ├── RightPanel.tsx   # Tabbed workspace
-│   │   ├── SystemBlueprint.tsx
-│   │   ├── GithubIssuesView.tsx
-│   │   └── BobConsole.tsx
+│   │   ├── ui/                      # Reusable UI components
+│   │   │   ├── Badge.tsx
+│   │   │   ├── Button.tsx
+│   │   │   ├── Card.tsx
+│   │   │   ├── SkeletonBlock.tsx
+│   │   │   ├── Tabs.tsx
+│   │   │   ├── ThemeToggle.tsx
+│   │   │   └── Toast.tsx
+│   │   ├── BobConsole.tsx           # Bob prompt generator
+│   │   ├── Chatbot.tsx              # AI chatbot interface
+│   │   ├── ChatMessage.tsx          # Chat message component
+│   │   ├── GithubIssuesView.tsx     # GitHub issues display
+│   │   ├── LeftPanel.tsx            # Transcript input area
+│   │   ├── RightPanel.tsx           # Tabbed workspace
+│   │   └── SystemBlueprint.tsx      # Technical task breakdown
 │   ├── context/
-│   │   └── ProjectPlannerContext.tsx
+│   │   └── ProjectPlannerContext.tsx # Global state management
 │   ├── data/
-│   │   └── mockData.ts      # Sample data
+│   │   └── mockData.ts              # Sample data
 │   ├── lib/
-│   │   └── utils.ts         # Utility functions
+│   │   └── utils.ts                 # Utility functions
 │   ├── types/
-│   │   └── index.ts         # TypeScript interfaces
-│   ├── App.tsx
-│   ├── main.tsx
-│   └── index.css
-├── index.html
-├── vite.config.ts
-├── tailwind.config.js
-├── tsconfig.json
-└── package.json
+│   │   └── index.ts                 # TypeScript interfaces
+│   ├── App.tsx                      # Main application component
+│   ├── main.tsx                     # Application entry point
+│   ├── index.css                    # Global styles
+│   └── vite-env.d.ts                # Vite type definitions
+├── .eslintrc.cjs                    # ESLint configuration
+├── .gitignore                       # Git ignore rules
+├── HANDOFF.md                       # Project handoff documentation
+├── index.html                       # HTML entry point
+├── package.json                     # Dependencies and scripts
+├── package-lock.json                # Locked dependency versions
+├── postcss.config.js                # PostCSS configuration
+├── README.md                        # This file
+├── tailwind.config.js               # Tailwind CSS configuration
+├── tsconfig.json                    # TypeScript configuration
+├── tsconfig.node.json               # TypeScript config for Node
+└── vite.config.ts                   # Vite build configuration
 ```
 
 ## 🎯 Usage Flow

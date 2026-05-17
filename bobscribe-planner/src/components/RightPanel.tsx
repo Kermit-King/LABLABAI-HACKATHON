@@ -1,8 +1,10 @@
 import React from 'react';
+import { MessageSquare } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/Tabs';
 import { SystemBlueprint } from './SystemBlueprint';
 import { GithubIssuesView } from './GithubIssuesView';
 import { BobConsole } from './BobConsole';
+import { ChatTab } from './ChatTab';
 
 export const RightPanel: React.FC = () => {
   return (
@@ -12,6 +14,10 @@ export const RightPanel: React.FC = () => {
           <TabsTrigger value="blueprint">System Blueprint</TabsTrigger>
           <TabsTrigger value="issues">GitHub Issues</TabsTrigger>
           <TabsTrigger value="bob">Bob Console</TabsTrigger>
+          <TabsTrigger value="chat" className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            AI Chat
+          </TabsTrigger>
         </TabsList>
         
         <div className="mt-4 w-full">
@@ -25,6 +31,10 @@ export const RightPanel: React.FC = () => {
           
           <TabsContent value="bob" className="w-full">
             <BobConsole />
+          </TabsContent>
+
+          <TabsContent value="chat" className="w-full h-[600px]">
+            <ChatTab />
           </TabsContent>
         </div>
       </Tabs>
