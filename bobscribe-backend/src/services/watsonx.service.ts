@@ -45,26 +45,136 @@ class WatsonxService {
   }
 
   /**
-   * Create a system prompt that forces structured JSON output
+   * Estimate token count (rough approximation: 1 token ≈ 4 characters)
    */
-  private createSystemPrompt(repositoryMap?: RepositoryMap): string {
-    const basePrompt = `You are an expert software engineering analyst. Your task is to analyze meeting transcripts and extract structured engineering requirements.
+  private estimateTokens(text: string): number {
+    return Math.ceil(text.length / 4);
+  }
 
-${repositoryMap ? this.createGitHubContextSection(repositoryMap) : ''}
+  /**
+   * Determine schema complexity level based on available token budget
+   */
+  private determineSchemaComplexity(transcript: string, repositoryMap?: RepositoryMap): 'full' | 'standard' | 'minimal' {
+    const maxTokens = env.WATSONX_MAX_TOKENS;
+    
+    // Estimate tokens used by input
+    const transcriptTokens = this.estimateTokens(transcript);
+    const repoContextTokens = repositoryMap ? this.estimateTokens(this.createGitHubContextSection(repositoryMap)) : 0;
+    const systemPromptBaseTokens = 800; // Approximate base system prompt size
+    
+    const inputTokens = transcriptTokens + repoContextTokens + systemPromptBaseTokens;
+    const availableOutputTokens = maxTokens - inputTokens;
+    
+    console.log('Token Budget Analysis:', {
+      maxTokens,
+      transcriptTokens,
+      repoContextTokens,
+      systemPromptBaseTokens,
+      totalInputTokens: inputTokens,
+      availableOutputTokens,
+      transcriptLength: transcript.length
+    });
+    
+    // Determine complexity based on available output tokens
+    if (availableOutputTokens < 1500) {
+      console.warn('⚠️ Low token budget - using MINIMAL schema');
+      return 'minimal';
+    } else if (availableOutputTokens < 3000) {
+      console.log('📊 Medium token budget - using STANDARD schema');
+      return 'standard';
+    } else {
+      console.log('✨ High token budget - using FULL schema');
+      return 'full';
+    }
+  }
 
-CRITICAL OUTPUT REQUIREMENTS:
-1. You MUST respond with ONLY a valid, COMPLETE JSON object
-2. The JSON MUST start with { and end with }
-3. Do NOT include markdown code blocks (no \`\`\`json or \`\`\`)
-4. Do NOT include any explanatory text before or after the JSON
-5. Do NOT include any comments inside the JSON
-6. ENSURE the JSON is COMPLETE - all arrays must be closed with ], all objects with }
-7. If you run out of space, prioritize completing the JSON structure over adding more details
-8. Every opened bracket/brace MUST have a matching closing bracket/brace
+  /**
+   * Generate schema based on complexity level
+   */
+  private getSchemaForComplexity(complexity: 'full' | 'standard' | 'minimal', repositoryMap?: RepositoryMap): string {
+    const minimalSchema = `{
+  "riskLevel": "Low" | "Medium" | "High",
+  "technicalTask": {
+    "id": "task-001",
+    "title": "string",
+    "description": "string (concise)",
+    "riskLevel": "Low" | "Medium" | "High",
+    "affectedFiles": [{"path": "string", "changeType": "create|modify|delete", "description": "string"}],
+    "implementationOrder": [{"order": 1, "description": "string", "files": ["string"], "completed": false}],
+    "estimatedEffort": "string"
+  },
+  "githubIssues": [
+    {
+      "id": "issue-001",
+      "title": "string",
+      "tags": ["string"],
+      "description": "string (brief)",
+      "priority": "low" | "medium" | "high"
+    }
+  ],
+  "bobPrompt": {
+    "systemContext": "string (brief)",
+    "taskBreakdown": "string (concise)",
+    "fileInstructions": "string (key changes only)"
+  }
+}`;
 
-Required JSON schema:
+    const standardSchema = `{
+  "riskLevel": "Low" | "Medium" | "High",
+  "technicalTask": {
+    "id": "task-001",
+    "title": "string",
+    "description": "string",
+    "riskLevel": "Low" | "Medium" | "High",
+    "affectedFiles": [
+      {
+        "path": "string",
+        "changeType": "create" | "modify" | "delete",
+        "description": "string",
+        "existsInRepo": boolean
+      }
+    ],
+    "implementationOrder": [
+      {
+        "order": 1,
+        "description": "string",
+        "files": ["string"],
+        "completed": false
+      }
+    ],
+    "estimatedEffort": "string"${repositoryMap ? `,
+    "repository": {
+      "owner": "string",
+      "name": "string",
+      "branch": "string",
+      "url": "string"
+    }` : ''}
+  },
+  "githubIssues": [
+    {
+      "id": "issue-001",
+      "title": "string",
+      "tags": ["string"],
+      "description": "string",
+      "acceptanceCriteria": [
+        {
+          "id": "ac-001-1",
+          "description": "string",
+          "completed": false
+        }
+      ],
+      "priority": "low" | "medium" | "high"
+    }
+  ],
+  "bobPrompt": {
+    "systemContext": "string",
+    "taskBreakdown": "string",
+    "fileInstructions": "string",
+    "acceptanceCriteria": "string"
+  }
+}`;
 
-{
+    const fullSchema = `{
   "riskLevel": "Low" | "Medium" | "High",
   "technicalTask": {
     "id": "task-001",
@@ -147,7 +257,44 @@ Required JSON schema:
     "acceptanceCriteria": "string (testable with file references)",
     "additionalNotes": "string (dependencies, constraints, risks)"
   }
-}
+}`;
+
+    if (complexity === 'minimal') return minimalSchema;
+    if (complexity === 'standard') return standardSchema;
+    return fullSchema;
+  }
+
+  /**
+   * Create a system prompt that forces structured JSON output
+   * Adapts schema complexity based on available token budget
+   */
+  private createSystemPrompt(repositoryMap?: RepositoryMap, complexity: 'full' | 'standard' | 'minimal' = 'full'): string {
+    const complexityNote = complexity === 'minimal'
+      ? '⚠️ USING MINIMAL SCHEMA - Keep responses concise and focused on essentials only.'
+      : complexity === 'standard'
+      ? '📊 USING STANDARD SCHEMA - Balance detail with brevity.'
+      : '✨ USING FULL SCHEMA - Provide comprehensive details.';
+
+    const basePrompt = `You are an expert software engineering analyst. Your task is to analyze meeting transcripts and extract structured engineering requirements.
+
+${complexityNote}
+
+${repositoryMap ? this.createGitHubContextSection(repositoryMap) : ''}
+
+CRITICAL OUTPUT REQUIREMENTS:
+1. You MUST respond with ONLY a valid, COMPLETE JSON object
+2. The JSON MUST start with { and end with }
+3. Do NOT include markdown code blocks (no \`\`\`json or \`\`\`)
+4. Do NOT include any explanatory text before or after the JSON
+5. Do NOT include any comments inside the JSON
+6. ENSURE the JSON is COMPLETE - all arrays must be closed with ], all objects with }
+7. If you run out of space, prioritize completing the JSON structure over adding more details
+8. Every opened bracket/brace MUST have a matching closing bracket/brace
+9. ${complexity === 'minimal' ? 'Keep all text fields BRIEF and CONCISE' : complexity === 'standard' ? 'Balance detail with conciseness' : 'Provide comprehensive details'}
+
+Required JSON schema:
+
+${this.getSchemaForComplexity(complexity, repositoryMap)}
 
 STRICT OUTPUT RULES:
 1. Your response MUST START with { and END with }
@@ -228,12 +375,17 @@ IMPORTANT INSTRUCTIONS:
 
   /**
    * Extract engineering intent from transcript using Watsonx.ai
+   * Automatically adapts schema complexity based on transcript length
    */
   async extractIntent(transcript: string, repositoryMap?: RepositoryMap): Promise<IntentPayload> {
     try {
       const accessToken = await this.getAccessToken();
 
-      const systemPrompt = this.createSystemPrompt(repositoryMap);
+      // Determine optimal schema complexity based on token budget
+      const complexity = this.determineSchemaComplexity(transcript, repositoryMap);
+      console.log(`🎯 Using ${complexity.toUpperCase()} schema complexity for this request`);
+
+      const systemPrompt = this.createSystemPrompt(repositoryMap, complexity);
       const userPrompt = `TRANSCRIPT:
 ${transcript}
 
