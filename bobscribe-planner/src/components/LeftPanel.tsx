@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Sparkles, Github, Upload, Check, GitBranch } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/Card';
-import { Button } from './ui/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
 import { useProjectPlanner } from '../context/ProjectPlannerContext';
 
 export const LeftPanel: React.FC = () => {
