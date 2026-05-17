@@ -372,6 +372,162 @@ IMPORTANT INSTRUCTIONS:
 8. Identify related files that might be affected by the changes
 `;
   }
+  /**
+   * Smart JSON repair function that intelligently fixes truncated JSON
+   * by analyzing structure and context rather than blindly adding brackets
+   */
+  private smartRepairJSON(jsonText: string): string {
+    console.log('🔧 Starting smart JSON repair...');
+    
+    interface StackItem {
+      type: 'object' | 'array';
+      position: number;
+    }
+    
+    const stack: StackItem[] = [];
+    let inString = false;
+    let escapeNext = false;
+    let lastValidPosition = 0;
+    
+    // Parse character by character to understand structure
+    for (let i = 0; i < jsonText.length; i++) {
+      const char = jsonText[i];
+      
+      // Handle escape sequences in strings
+      if (escapeNext) {
+        escapeNext = false;
+        continue;
+      }
+      
+      if (char === '\\') {
+        escapeNext = true;
+        continue;
+      }
+      
+      // Handle string boundaries
+      if (char === '"') {
+        inString = !inString;
+        if (!inString) {
+          lastValidPosition = i;
+        }
+        continue;
+      }
+      
+      // Skip characters inside strings
+      if (inString) {
+        continue;
+      }
+      
+      // Track structure
+      if (char === '{') {
+        stack.push({ type: 'object', position: i });
+      } else if (char === '[') {
+        stack.push({ type: 'array', position: i });
+      } else if (char === '}') {
+        if (stack.length > 0 && stack[stack.length - 1].type === 'object') {
+          stack.pop();
+          lastValidPosition = i;
+        } else {
+          console.warn(`⚠️ Unexpected '}' at position ${i} - truncating here`);
+          jsonText = jsonText.substring(0, i);
+          break;
+        }
+      } else if (char === ']') {
+        if (stack.length > 0 && stack[stack.length - 1].type === 'array') {
+          stack.pop();
+          lastValidPosition = i;
+        } else {
+          console.warn(`⚠️ Unexpected ']' at position ${i} - truncating here`);
+          jsonText = jsonText.substring(0, i);
+          break;
+        }
+      } else if (char === ',' || char === ':') {
+        if (stack.length > 0) {
+          lastValidPosition = i;
+        }
+      }
+    }
+    
+    console.log('📊 Parse analysis:', {
+      totalLength: jsonText.length,
+      lastValidPosition,
+      unclosedStructures: stack.length,
+      inString,
+      stackDepth: stack.map(s => s.type).join(' > ')
+    });
+    
+    // If we're in the middle of a string, truncate before it
+    if (inString) {
+      console.log('✂️ Truncating incomplete string');
+      // Find the last complete element before the unclosed string
+      const lastComma = jsonText.lastIndexOf(',', lastValidPosition);
+      const lastColon = jsonText.lastIndexOf(':', lastValidPosition);
+      const truncateAt = Math.max(lastComma, lastColon);
+      
+      if (truncateAt > 0) {
+        jsonText = jsonText.substring(0, truncateAt);
+        // Re-parse to update stack
+        return this.smartRepairJSON(jsonText);
+      }
+    }
+    
+    // Remove any trailing incomplete content after last valid position
+    if (lastValidPosition < jsonText.length - 1) {
+      const trailing = jsonText.substring(lastValidPosition + 1).trim();
+      // Check if trailing content is just whitespace and closing brackets/braces
+      if (trailing && !trailing.match(/^[\s\}\]]*$/)) {
+        console.log('✂️ Removing trailing incomplete content:', trailing.substring(0, 100));
+        jsonText = jsonText.substring(0, lastValidPosition + 1);
+      }
+    }
+    
+    // Remove trailing commas before closing
+    jsonText = jsonText.replace(/,(\s*)$/, '$1');
+    
+    // Close all unclosed structures in reverse order (LIFO - Last In First Out)
+    let closingChars = '';
+    const closingLog: string[] = [];
+    
+    while (stack.length > 0) {
+      const item = stack.pop()!;
+      if (item.type === 'array') {
+        closingChars += ']';
+        closingLog.push(`array@${item.position}`);
+      } else {
+        closingChars += '}';
+        closingLog.push(`object@${item.position}`);
+      }
+    }
+    
+    if (closingChars) {
+      console.log(`🔧 Closing ${closingLog.length} unclosed structures: ${closingLog.join(', ')}`);
+      console.log(`   Adding: "${closingChars}"`);
+    }
+    
+    const repairedJSON = jsonText + closingChars;
+    console.log('✅ Smart repair complete');
+    console.log('   Repaired JSON (last 200 chars):', repairedJSON.substring(Math.max(0, repairedJSON.length - 200)));
+    
+    // Validate the repair
+    const finalOpenBraces = (repairedJSON.match(/\{/g) || []).length;
+    const finalCloseBraces = (repairedJSON.match(/\}/g) || []).length;
+    const finalOpenBrackets = (repairedJSON.match(/\[/g) || []).length;
+    const finalCloseBrackets = (repairedJSON.match(/\]/g) || []).length;
+    
+    console.log('🔍 Final structure validation:', {
+      braces: `${finalOpenBraces}/${finalCloseBraces}`,
+      brackets: `${finalOpenBrackets}/${finalCloseBrackets}`,
+      balanced: finalOpenBraces === finalCloseBraces && finalOpenBrackets === finalCloseBrackets
+    });
+    
+    if (finalOpenBraces !== finalCloseBraces || finalOpenBrackets !== finalCloseBrackets) {
+      console.error('❌ Smart repair failed to balance structures');
+      throw new Error(`Smart repair failed. Braces: ${finalOpenBraces}/${finalCloseBraces}, Brackets: ${finalOpenBrackets}/${finalCloseBrackets}`);
+    }
+    
+    return repairedJSON;
+  }
+
 
   /**
    * Extract engineering intent from transcript using Watsonx.ai
@@ -489,43 +645,12 @@ JSON OUTPUT:`;
       });
 
       if (openBraces !== closeBraces || openBrackets !== closeBrackets) {
-        console.warn('Unbalanced JSON structure detected - attempting to fix');
+        console.warn('Unbalanced JSON structure detected - attempting smart repair');
         console.warn(`Braces: ${openBraces}/${closeBraces}, Brackets: ${openBrackets}/${closeBrackets}`);
         
-        // Attempt to fix incomplete JSON by closing missing brackets/braces
-        let fixedText = cleanedText;
-        
-        // Close missing brackets
-        const missingBrackets = openBrackets - closeBrackets;
-        if (missingBrackets > 0) {
-          console.log(`Adding ${missingBrackets} missing closing bracket(s)`);
-          fixedText += ']'.repeat(missingBrackets);
-        }
-        
-        // Close missing braces
-        const missingBraces = openBraces - closeBraces;
-        if (missingBraces > 0) {
-          console.log(`Adding ${missingBraces} missing closing brace(s)`);
-          fixedText += '}'.repeat(missingBraces);
-        }
-        
-        // Update cleanedText with fixed version
-        cleanedText = fixedText;
-        console.log('Fixed JSON (last 500 chars):', cleanedText.substring(Math.max(0, cleanedText.length - 500)));
-        
-        // Verify the fix
-        const newOpenBraces = (cleanedText.match(/\{/g) || []).length;
-        const newCloseBraces = (cleanedText.match(/\}/g) || []).length;
-        const newOpenBrackets = (cleanedText.match(/\[/g) || []).length;
-        const newCloseBrackets = (cleanedText.match(/\]/g) || []).length;
-        
-        if (newOpenBraces !== newCloseBraces || newOpenBrackets !== newCloseBrackets) {
-          console.error('Failed to fix JSON structure');
-          console.error('Full cleaned text:', cleanedText);
-          throw new Error(`Unable to fix incomplete JSON. Braces: ${newOpenBraces}/${newCloseBraces}, Brackets: ${newOpenBrackets}/${newCloseBrackets}`);
-        }
-        
-        console.log('Successfully fixed JSON structure');
+        // Use smart JSON repair instead of blind bracket/brace addition
+        cleanedText = this.smartRepairJSON(cleanedText);
+        console.log('Smart repair completed. Result (last 500 chars):', cleanedText.substring(Math.max(0, cleanedText.length - 500)));
       }
 
       // Parse the JSON response
