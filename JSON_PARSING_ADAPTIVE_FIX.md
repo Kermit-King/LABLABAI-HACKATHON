@@ -18,7 +18,7 @@ Failed to parse AI response as JSON: Expected ',' or '}' after property value in
 
 ### 1. Adaptive Schema Complexity ✨
 
-**Location**: `bobscribe-backend/src/services/watsonx.service.ts`
+**Location**: `nats-backend/src/services/watsonx.service.ts`
 
 Added three schema complexity levels that automatically adapt based on available token budget:
 
@@ -98,7 +98,7 @@ Added comprehensive logging at each stage:
 
 ### Files Modified
 
-1. **`bobscribe-backend/src/services/watsonx.service.ts`**
+1. **`nats-backend/src/services/watsonx.service.ts`**
    - Added `estimateTokens()` method
    - Added `determineSchemaComplexity()` method
    - Added `getSchemaForComplexity()` method

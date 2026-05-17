@@ -8,18 +8,18 @@
 ## 🎯 Results
 
 ### Before Upgrade
-- **bobscribe-backend:** 11 high severity vulnerabilities
-- **bobscribe-planner:** 6 high, 2 moderate severity vulnerabilities
+- **nats-backend:** 11 high severity vulnerabilities
+- **nats-planner:** 6 high, 2 moderate severity vulnerabilities
 - **Total:** 19 vulnerabilities
 
 ### After Upgrade
-- **bobscribe-backend:** ✅ 0 vulnerabilities
-- **bobscribe-planner:** ✅ 0 vulnerabilities
+- **nats-backend:** ✅ 0 vulnerabilities
+- **nats-planner:** ✅ 0 vulnerabilities
 - **Total:** ✅ 0 vulnerabilities
 
 ---
 
-## 📦 bobscribe-backend Updates
+## 📦 nats-backend Updates
 
 ### Dependencies Updated
 
@@ -62,7 +62,7 @@
 
 ---
 
-## 📦 bobscribe-planner Updates
+## 📦 nats-planner Updates
 
 ### Dependencies Updated
 
@@ -167,13 +167,13 @@ The Vite upgrade includes:
 
 ```bash
 # Backend
-cd bobscribe-backend
+cd nats-backend
 npm run dev          # Test development server
 npm run build        # Test production build
 npm audit            # Verify 0 vulnerabilities
 
 # Frontend
-cd bobscribe-planner
+cd nats-planner
 npm run dev          # Test development server
 npm run build        # Test production build
 npm run preview      # Test production preview

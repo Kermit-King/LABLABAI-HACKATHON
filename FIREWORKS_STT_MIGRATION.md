@@ -6,7 +6,7 @@ Successfully migrated from IBM Watson Speech-to-Text to Fireworks AI Speech-to-T
 ## Changes Made
 
 ### 1. New Service Implementation
-**File:** `bobscribe-backend/src/services/fireworks.service.ts`
+**File:** `nats-backend/src/services/fireworks.service.ts`
 - Created `FireworksSTTService` class to handle audio transcription
 - Uses Fireworks AI's Whisper v3 Turbo model
 - Supports multiple audio formats: WAV, MP3, OGG, WebM, M4A
@@ -14,22 +14,22 @@ Successfully migrated from IBM Watson Speech-to-Text to Fireworks AI Speech-to-T
 - Maintains the same interface as Watson STT for seamless integration
 
 ### 2. Environment Configuration
-**File:** `bobscribe-backend/src/config/env.ts`
+**File:** `nats-backend/src/config/env.ts`
 - Removed: `WATSON_STT_APIKEY` and `WATSON_STT_URL`
 - Added: `FIREWORKS_API_KEY`
 
-**File:** `bobscribe-backend/.env.example`
+**File:** `nats-backend/.env.example`
 - Updated with Fireworks AI configuration template
 
 ### 3. Route Updates
-**File:** `bobscribe-backend/src/routes/planner.routes.ts`
+**File:** `nats-backend/src/routes/planner.routes.ts`
 - Replaced `watsonSTTService` import with `fireworksSTTService`
 - Updated transcription calls to use Fireworks AI
 - Updated health check endpoint to report Fireworks AI status
 - Added filename parameter for better format detection
 
 ### 4. Dependencies
-**File:** `bobscribe-backend/package.json`
+**File:** `nats-backend/package.json`
 - Added: `form-data` (^4.0.0) - for multipart form uploads
 - Added: `node-fetch` (^3.3.2) - for HTTP requests to Fireworks AI
 - Added: `@types/node-fetch` (^2.6.11) - TypeScript types
@@ -42,7 +42,7 @@ Successfully migrated from IBM Watson Speech-to-Text to Fireworks AI Speech-to-T
 3. Generate an API key
 
 ### 2. Update Environment Variables
-Edit your `.env` file in the `bobscribe-backend` directory:
+Edit your `.env` file in the `nats-backend` directory:
 
 ```bash
 # Replace Watson STT credentials with Fireworks AI
@@ -57,7 +57,7 @@ Remove these old variables:
 
 ### 3. Install Dependencies
 ```bash
-cd bobscribe-backend
+cd nats-backend
 npm install
 ```
 

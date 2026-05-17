@@ -1,6 +1,6 @@
-# BobScribe Backend API
+# NATS Backend API
 
-Engineering intent orchestration pipeline powered by IBM Watson and Watsonx.ai.
+Notes-to-Action Task Synthesizer - Engineering intent orchestration pipeline powered by IBM Watson and Watsonx.ai.
 
 ## 🚀 Features
 
@@ -26,7 +26,7 @@ Engineering intent orchestration pipeline powered by IBM Watson and Watsonx.ai.
 
 ### Step 1: Install Dependencies
 ```bash
-cd bobscribe-backend
+cd nats-backend
 npm install
 ```
 
@@ -217,7 +217,7 @@ Service information and available endpoints.
 ## 🏗️ Project Structure
 
 ```
-bobscribe-backend/
+nats-backend/
 ├── src/
 │   ├── config/
 │   │   └── env.ts              # Environment validation

@@ -1,6 +1,6 @@
-# 🎯 BobScribe - AI-Powered Engineering Intent Orchestration
+# 🎯 NATS: Notes-to-Action Task Synthesizer
 
-Transform meeting transcripts and notes into highly structured, context-aware engineering instructions designed for IBM Bob autonomous codebase modification.
+AI-Powered Engineering Intent Orchestration - Transform meeting transcripts and notes into highly structured, context-aware engineering instructions designed for IBM Bob autonomous codebase modification.
 
 ## 🚀 Quick Start
 
@@ -17,7 +17,7 @@ Transform meeting transcripts and notes into highly structured, context-aware en
 
 **Terminal 1 - Backend:**
 ```bash
-cd bobscribe-backend
+cd nats-backend
 npm install
 cp .env.example .env
 # Edit .env with your IBM credentials (see Backend Setup below)
@@ -27,7 +27,7 @@ npm run dev
 
 **Terminal 2 - Frontend:**
 ```bash
-cd bobscribe-planner
+cd nats-planner
 npm install
 npm run dev
 ```
@@ -39,7 +39,7 @@ npm run dev
 npm install -g concurrently
 
 # From project root directory
-concurrently "cd bobscribe-backend && npm run dev" "cd bobscribe-planner && npm run dev"
+concurrently "cd nats-backend && npm run dev" "cd nats-planner && npm run dev"
 ```
 
 ---
@@ -48,7 +48,7 @@ concurrently "cd bobscribe-backend && npm run dev" "cd bobscribe-planner && npm 
 
 ```
 LABLABAI-HACKATHON/
-├── bobscribe-backend/          # Fastify API Server (Port 3001)
+├── nats-backend/          # Fastify API Server (Port 3001)
 │   ├── src/
 │   │   ├── config/            # Environment validation
 │   │   ├── services/          # Watson STT & Watsonx.ai integration
@@ -57,7 +57,7 @@ LABLABAI-HACKATHON/
 │   ├── .env.example           # Environment template
 │   └── package.json
 │
-└── bobscribe-planner/         # React Frontend (Port 5173)
+└── nats-planner/         # React Frontend (Port 5173)
     ├── src/
     │   ├── components/        # UI components
     │   ├── context/           # State management
@@ -68,11 +68,11 @@ LABLABAI-HACKATHON/
 
 ---
 
-## 🔧 Backend Setup (bobscribe-backend)
+## 🔧 Backend Setup (nats-backend)
 
 ### 1. Install Dependencies
 ```bash
-cd bobscribe-backend
+cd nats-backend
 npm install
 ```
 
@@ -126,15 +126,15 @@ curl http://localhost:3001/api/v1/planner/health
 # {"success":true,"services":{"watsonSTT":"healthy","watsonx":"healthy"}}
 ```
 
-**📚 Full Backend Documentation:** See [bobscribe-backend/README.md](bobscribe-backend/README.md)
+**📚 Full Backend Documentation:** See [nats-backend/README.md](nats-backend/README.md)
 
 ---
 
-## 🎨 Frontend Setup (bobscribe-planner)
+## 🎨 Frontend Setup (nats-planner)
 
 ### 1. Install Dependencies
 ```bash
-cd bobscribe-planner
+cd nats-planner
 npm install
 ```
 
@@ -151,7 +151,7 @@ npm run preview
 ### 3. Access Application
 Open your browser to: `http://localhost:5173`
 
-**📚 Full Frontend Documentation:** See [bobscribe-planner/README.md](bobscribe-planner/README.md)
+**📚 Full Frontend Documentation:** See [nats-planner/README.md](nats-planner/README.md)
 
 ---
 
@@ -266,7 +266,7 @@ curl -X POST http://localhost:3001/api/v1/planner/analyze \
 The backend will fail to start if required IBM credentials are missing. Check console for specific errors.
 
 ### CORS Issues
-Backend is configured for `http://localhost:5173`. If you change the frontend port, update CORS settings in `bobscribe-backend/src/index.ts`.
+Backend is configured for `http://localhost:5173`. If you change the frontend port, update CORS settings in `nats-backend/src/index.ts`.
 
 ### Connection Refused
 Ensure the backend is running before starting the frontend. The frontend makes API calls to `http://localhost:3001`.
@@ -318,7 +318,7 @@ Built with ❤️ for the LabLabAI Hackathon
 
 ## 🔗 Additional Resources
 
-- [Backend API Documentation](bobscribe-backend/README.md)
-- [Frontend Application Guide](bobscribe-planner/README.md)
+- [Backend API Documentation](nats-backend/README.md)
+- [Frontend Application Guide](nats-planner/README.md)
 - [IBM Watson Documentation](https://cloud.ibm.com/docs/watson)
 - [IBM Watsonx.ai Documentation](https://www.ibm.com/products/watsonx-ai)

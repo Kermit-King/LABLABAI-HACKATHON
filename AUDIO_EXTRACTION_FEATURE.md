@@ -1,7 +1,7 @@
 # Audio Extraction Feature
 
 ## Overview
-The BobScribe backend now supports **automatic extraction** of engineering intent from audio files. Once an audio file is uploaded, it is automatically:
+The NATS (Notes-to-Action Task Synthesizer) backend now supports **automatic extraction** of engineering intent from audio files. Once an audio file is uploaded, it is automatically:
 1. **Transcribed** using Fireworks AI Speech-to-Text (STT)
 2. **Analyzed** using Watsonx.ai to extract engineering intent
 3. **Returned** with the complete analysis including the transcript

@@ -1,7 +1,7 @@
 {
-  "name": "bobscribe-backend",
+  "name": "nats-backend",
   "version": "1.0.0",
-  "description": "BobScribe backend API - Engineering intent orchestration pipeline",
+  "description": "NATS (Notes-to-Action Task Synthesizer) backend API - Engineering intent orchestration pipeline",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {

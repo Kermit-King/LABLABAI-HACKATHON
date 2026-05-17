@@ -1,6 +1,6 @@
-# BobScribe Architecture & Feature Planner
+# NATS Architecture & Feature Planner
 
-A sophisticated web application that transforms meeting transcripts and notes into highly structured, context-aware engineering instructions designed for IBM Bob autonomous codebase modification.
+Notes-to-Action Task Synthesizer - A sophisticated web application that transforms meeting transcripts and notes into highly structured, context-aware engineering instructions designed for IBM Bob autonomous codebase modification.
 
 ## 🚀 Features
 
@@ -29,13 +29,13 @@ A sophisticated web application that transforms meeting transcripts and notes in
 
 - Node.js 18+
 - npm or yarn
-- **Backend API running** on `http://localhost:3001` (see [bobscribe-backend](../bobscribe-backend/README.md))
+- **Backend API running** on `http://localhost:3001` (see [nats-backend](../nats-backend/README.md))
 
 ## 🛠️ Installation & Setup
 
 ### Step 1: Install Dependencies
 ```bash
-cd bobscribe-planner
+cd nats-planner
 npm install
 ```
 
@@ -86,7 +86,7 @@ npm run lint
 ## 📁 Project Structure
 
 ```
-bobscribe-planner/
+nats-planner/
 ├── src/
 │   ├── components/
 │   │   ├── ui/                      # shadcn/ui components
@@ -292,4 +292,4 @@ Built with ❤️ for the LabLabAI Hackathon
 ## 🔗 Related Documentation
 
 - [Main Project README](../README.md) - Complete setup guide
-- [Backend API Documentation](../bobscribe-backend/README.md) - API endpoints and configuration
+- [Backend API Documentation](../nats-backend/README.md) - API endpoints and configuration

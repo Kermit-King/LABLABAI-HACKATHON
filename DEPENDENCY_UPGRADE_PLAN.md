@@ -6,7 +6,7 @@ This document outlines the plan to address **19 total vulnerabilities** (11 high
 
 ---
 
-## 🔴 bobscribe-backend Upgrades
+## 🔴 nats-backend Upgrades
 
 ### Critical Security Updates
 
@@ -27,8 +27,8 @@ This document outlines the plan to address **19 total vulnerabilities** (11 high
 - Request/Reply lifecycle changes
 
 **Code Impact Assessment:**
-- ✅ [`src/index.ts`](bobscribe-backend/src/index.ts:1) - Uses standard Fastify patterns, likely compatible
-- ✅ [`src/routes/planner.routes.ts`](bobscribe-backend/src/routes/planner.routes.ts:1) - Need to verify route handlers
+- ✅ [`src/index.ts`](nats-backend/src/index.ts:1) - Uses standard Fastify patterns, likely compatible
+- ✅ [`src/routes/planner.routes.ts`](nats-backend/src/routes/planner.routes.ts:1) - Need to verify route handlers
 - ⚠️ Plugin registrations (cors, multipart) - May need syntax updates
 
 #### 2. TypeScript ESLint v6 → v8 (BREAKING CHANGE)
@@ -66,7 +66,7 @@ This document outlines the plan to address **19 total vulnerabilities** (11 high
 
 ---
 
-## 🟡 bobscribe-planner Upgrades
+## 🟡 nats-planner Upgrades
 
 ### Critical Security Updates
 
@@ -84,7 +84,7 @@ This document outlines the plan to address **19 total vulnerabilities** (11 high
 - Build output changes
 
 **Code Impact Assessment:**
-- ⚠️ [`vite.config.ts`](bobscribe-planner/vite.config.ts:1) - Simple config, likely compatible
+- ⚠️ [`vite.config.ts`](nats-planner/vite.config.ts:1) - Simple config, likely compatible
 - ✅ Uses standard React plugin - Should work with v8
 
 #### 2. TypeScript ESLint v6 → v8 (NON-BREAKING for runtime)
@@ -99,7 +99,7 @@ This document outlines the plan to address **19 total vulnerabilities** (11 high
 **Target:** `^9.x`
 
 **Code Impact Assessment:**
-- ⚠️ [`.eslintrc.cjs`](bobscribe-planner/.eslintrc.cjs:1) - Needs migration to flat config
+- ⚠️ [`.eslintrc.cjs`](nats-planner/.eslintrc.cjs:1) - Needs migration to flat config
 
 ---
 
@@ -108,7 +108,7 @@ This document outlines the plan to address **19 total vulnerabilities** (11 high
 ### Phase 1: Backend Updates (Breaking Changes)
 
 ```bash
-cd bobscribe-backend
+cd nats-backend
 
 # Update Fastify and related packages
 npm install fastify@^5.8.5 @fastify/cors@latest @fastify/multipart@latest
@@ -130,7 +130,7 @@ npm install -D eslint@^9.x
 ### Phase 2: Frontend Updates (Breaking Changes)
 
 ```bash
-cd bobscribe-planner
+cd nats-planner
 
 # Update Vite
 npm install -D vite@^8.0.13
@@ -200,12 +200,12 @@ If issues occur after updates:
 
 ```bash
 # Backend rollback
-cd bobscribe-backend
+cd nats-backend
 git checkout package.json package-lock.json
 npm install
 
 # Frontend rollback
-cd bobscribe-planner
+cd nats-planner
 git checkout package.json package-lock.json
 npm install
 ```

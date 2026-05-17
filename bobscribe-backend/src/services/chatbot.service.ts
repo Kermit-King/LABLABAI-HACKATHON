@@ -66,7 +66,7 @@ class ChatbotService {
 
  
   private buildSystemPrompt(context: ChatContext): string {
-    let prompt = `You are a helpful AI assistant for the BobScribe project planning tool. Your role is to answer questions about the analyzed meeting transcript and generated outputs.
+    let prompt = `You are a helpful AI assistant for the NATS (Notes-to-Action Task Synthesizer) project planning tool. Your role is to answer questions about the analyzed meeting transcript and generated outputs.
 
 IMPORTANT RULES:
 1. Answer ONLY based on the provided context below

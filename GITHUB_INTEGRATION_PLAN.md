@@ -1,7 +1,7 @@
 # GitHub Integration Implementation Plan
 
-**Project:** BobScribe Architecture & Feature Planner  
-**Feature:** GitHub Repository Integration with AI-Powered Analysis  
+**Project:** NATS (Notes-to-Action Task Synthesizer) Architecture & Feature Planner
+**Feature:** GitHub Repository Integration with AI-Powered Analysis
 **Date:** 2026-05-16  
 **Status:** Planning Phase
 
@@ -61,7 +61,7 @@ graph TB
 
 ### 2. Backend GitHub Service
 
-**File:** `bobscribe-backend/src/services/github.service.ts`
+**File:** `nats-backend/src/services/github.service.ts`
 
 **Core Methods:**
 ```typescript
@@ -111,7 +111,7 @@ const IGNORE_PATTERNS = [
 
 ### 3. Enhanced Type Definitions
 
-**File:** `bobscribe-backend/src/types/github.ts`
+**File:** `nats-backend/src/types/github.ts`
 
 ```typescript
 export interface Repository {
@@ -167,7 +167,7 @@ export interface RepositoryMap {
 
 ### 4. Enhanced System Blueprint
 
-**Updated Type:** `bobscribe-planner/src/types/index.ts`
+**Updated Type:** `nats-planner/src/types/index.ts`
 
 ```typescript
 export interface TechnicalTask {
@@ -370,10 +370,10 @@ githubIssues: [
 7. Write unit tests for GitHub service
 
 **Files to Create/Modify:**
-- `bobscribe-backend/src/services/github.service.ts` (create)
-- `bobscribe-backend/src/types/github.ts` (create)
-- `bobscribe-backend/src/config/env.ts` (modify - add GitHub OAuth config)
-- `bobscribe-backend/.env.example` (modify - add GitHub credentials)
+- `nats-backend/src/services/github.service.ts` (create)
+- `nats-backend/src/types/github.ts` (create)
+- `nats-backend/src/config/env.ts` (modify - add GitHub OAuth config)
+- `nats-backend/.env.example` (modify - add GitHub credentials)
 
 ### Phase 2: Backend API Routes (Day 2)
 
@@ -386,9 +386,9 @@ githubIssues: [
 6. Add rate limiting middleware
 
 **Files to Create/Modify:**
-- `bobscribe-backend/src/routes/github.routes.ts` (create)
-- `bobscribe-backend/src/routes/planner.routes.ts` (modify)
-- `bobscribe-backend/src/index.ts` (modify - register new routes)
+- `nats-backend/src/routes/github.routes.ts` (create)
+- `nats-backend/src/routes/planner.routes.ts` (modify)
+- `nats-backend/src/index.ts` (modify - register new routes)
 
 ### Phase 3: Enhanced AI Integration (Days 3-4)
 
@@ -400,8 +400,8 @@ githubIssues: [
 5. Add validation for AI responses with GitHub context
 
 **Files to Modify:**
-- `bobscribe-backend/src/services/watsonx.service.ts`
-- `bobscribe-backend/src/types/intent.ts`
+- `nats-backend/src/services/watsonx.service.ts`
+- `nats-backend/src/types/intent.ts`
 
 ### Phase 4: Frontend OAuth Flow (Day 4)
 
@@ -414,9 +414,9 @@ githubIssues: [
 6. Add disconnect/reconnect functionality
 
 **Files to Create/Modify:**
-- `bobscribe-planner/src/components/GitHubConnect.tsx` (create)
-- `bobscribe-planner/src/components/LeftPanel.tsx` (modify)
-- `bobscribe-planner/src/context/ProjectPlannerContext.tsx` (modify)
+- `nats-planner/src/components/GitHubConnect.tsx` (create)
+- `nats-planner/src/components/LeftPanel.tsx` (modify)
+- `nats-planner/src/context/ProjectPlannerContext.tsx` (modify)
 
 ### Phase 5: Enhanced UI Components (Days 5-6)
 
@@ -429,11 +429,11 @@ githubIssues: [
 6. Implement error handling UI
 
 **Files to Create/Modify:**
-- `bobscribe-planner/src/components/SystemBlueprint.tsx` (modify)
-- `bobscribe-planner/src/components/GithubIssuesView.tsx` (modify)
-- `bobscribe-planner/src/components/BobConsole.tsx` (modify)
-- `bobscribe-planner/src/components/FileTreeView.tsx` (create)
-- `bobscribe-planner/src/types/index.ts` (modify)
+- `nats-planner/src/components/SystemBlueprint.tsx` (modify)
+- `nats-planner/src/components/GithubIssuesView.tsx` (modify)
+- `nats-planner/src/components/BobConsole.tsx` (modify)
+- `nats-planner/src/components/FileTreeView.tsx` (create)
+- `nats-planner/src/types/index.ts` (modify)
 
 ### Phase 6: Integration & Testing (Day 7)
 

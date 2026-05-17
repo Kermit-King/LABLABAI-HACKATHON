@@ -7,7 +7,7 @@
 
 ## Overview
 
-A context-aware chatbot has been successfully integrated into BobScribe. The chatbot uses the meeting transcript and AI-generated outputs (System Blueprint, GitHub Issues, Bob Console prompts) as its knowledge base to answer follow-up questions.
+A context-aware chatbot has been successfully integrated into NATS (Notes-to-Action Task Synthesizer). The chatbot uses the meeting transcript and AI-generated outputs (System Blueprint, GitHub Issues, Bob Console prompts) as its knowledge base to answer follow-up questions.
 
 ---
 
@@ -60,7 +60,7 @@ A context-aware chatbot has been successfully integrated into BobScribe. The cha
 
 ### Backend Components
 
-#### 1. Chatbot Service (`bobscribe-backend/src/services/chatbot.service.ts`)
+#### 1. Chatbot Service (`nats-backend/src/services/chatbot.service.ts`)
 
 **Key Features:**
 - Builds comprehensive context from all available data
@@ -87,7 +87,7 @@ A context-aware chatbot has been successfully integrated into BobScribe. The cha
 }
 ```
 
-#### 2. Chatbot Routes (`bobscribe-backend/src/routes/chatbot.routes.ts`)
+#### 2. Chatbot Routes (`nats-backend/src/routes/chatbot.routes.ts`)
 
 **Endpoints:**
 
@@ -99,14 +99,14 @@ A context-aware chatbot has been successfully integrated into BobScribe. The cha
 **GET /api/v1/chatbot/health**
 - Health check for chatbot service
 
-#### 3. Server Integration (`bobscribe-backend/src/index.ts`)
+#### 3. Server Integration (`nats-backend/src/index.ts`)
 
 - Registered chatbot routes at `/api/v1/chatbot`
 - Added to server startup banner
 
 ### Frontend Components
 
-#### 1. Chatbot Component (`bobscribe-planner/src/components/Chatbot.tsx`)
+#### 1. Chatbot Component (`nats-planner/src/components/Chatbot.tsx`)
 
 **UI Features:**
 - Floating widget (bottom-right corner)
@@ -123,7 +123,7 @@ A context-aware chatbot has been successfully integrated into BobScribe. The cha
 - Displays context availability status
 - Smooth animations and transitions
 
-#### 2. Context Integration (`bobscribe-planner/src/context/ProjectPlannerContext.tsx`)
+#### 2. Context Integration (`nats-planner/src/context/ProjectPlannerContext.tsx`)
 
 **New State:**
 ```typescript
@@ -144,7 +144,7 @@ A context-aware chatbot has been successfully integrated into BobScribe. The cha
 - Bob Console Prompts (if generated)
 - Chat history (last 5 messages)
 
-#### 3. App Integration (`bobscribe-planner/src/App.tsx`)
+#### 3. App Integration (`nats-planner/src/App.tsx`)
 
 - Chatbot component added as floating widget
 - Always accessible regardless of current view
@@ -189,19 +189,19 @@ See the full implementation details in the Bob Console tab."
 ## Files Created/Modified
 
 ### Backend (New Files)
-- ✅ `bobscribe-backend/src/services/chatbot.service.ts` (234 lines)
-- ✅ `bobscribe-backend/src/routes/chatbot.routes.ts` (99 lines)
+- ✅ `nats-backend/src/services/chatbot.service.ts` (234 lines)
+- ✅ `nats-backend/src/routes/chatbot.routes.ts` (99 lines)
 
 ### Backend (Modified Files)
-- ✅ `bobscribe-backend/src/index.ts` - Added chatbot routes
+- ✅ `nats-backend/src/index.ts` - Added chatbot routes
 
 ### Frontend (New Files)
-- ✅ `bobscribe-planner/src/components/Chatbot.tsx` (186 lines)
-- ✅ `bobscribe-planner/src/components/ChatMessage.tsx` (127 lines) - Code syntax highlighting component
+- ✅ `nats-planner/src/components/Chatbot.tsx` (186 lines)
+- ✅ `nats-planner/src/components/ChatMessage.tsx` (127 lines) - Code syntax highlighting component
 
 ### Frontend (Modified Files)
-- ✅ `bobscribe-planner/src/context/ProjectPlannerContext.tsx` - Added chat functionality
-- ✅ `bobscribe-planner/src/App.tsx` - Added Chatbot component
+- ✅ `nats-planner/src/context/ProjectPlannerContext.tsx` - Added chat functionality
+- ✅ `nats-planner/src/App.tsx` - Added Chatbot component
 
 ### Dependencies Added
 - ✅ `react-syntax-highlighter` - Code syntax highlighting
@@ -322,14 +322,14 @@ headers: {
 
 **Backend:**
 ```bash
-cd bobscribe-backend
+cd nats-backend
 npm run dev
 ```
 Server runs on: http://localhost:3001
 
 **Frontend:**
 ```bash
-cd bobscribe-planner
+cd nats-planner
 npm run dev
 ```
 Frontend runs on: http://localhost:5173

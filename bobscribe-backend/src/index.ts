@@ -65,7 +65,7 @@ async function bootstrap() {
   // Root health check
   fastify.get('/', async () => {
     return {
-      service: 'BobScribe Backend API',
+      service: 'NATS Backend API',
       version: '1.0.0',
       status: 'running',
       timestamp: new Date().toISOString(),
@@ -82,7 +82,7 @@ async function bootstrap() {
     fastify.log.info(`
 ╔═══════════════════════════════════════════════════════════╗
 ║                                                           ║
-║   🚀 BobScribe Backend API Server                        ║
+║   🚀 NATS Backend API Server                             ║
 ║                                                           ║
 ║   Environment: ${env.NODE_ENV.padEnd(43)}║
 ║   Port:        ${env.PORT.toString().padEnd(43)}║

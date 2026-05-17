@@ -1,14 +1,14 @@
-# BobScribe Planner - UI/UX Enhancement Handoff Document
+# NATS Planner - UI/UX Enhancement Handoff Document
 
 **Date:** 2026-05-16  
 **Developer:** Bob (AI Assistant)  
-**Project:** BobScribe Architecture & Feature Planner
+**Project:** NATS Architecture & Feature Planner
 
 ---
 
 ## Overview
 
-This document summarizes the comprehensive UI/UX improvements made to the BobScribe Planner application. All changes maintain backward compatibility while significantly enhancing user experience across desktop and mobile devices.
+This document summarizes the comprehensive UI/UX improvements made to the NATS Planner application. All changes maintain backward compatibility while significantly enhancing user experience across desktop and mobile devices.
 
 ---
 
@@ -419,7 +419,7 @@ For questions about these changes:
 
 ## Overview
 
-This document details the implementation of GitHub repository integration that enables BobScribe to:
+This document details the implementation of GitHub repository integration that enables NATS to:
 1. Connect to GitHub repositories using Personal Access Tokens
 2. Fetch and analyze repository structure
 3. Map meeting transcripts to actual codebase files
@@ -435,11 +435,11 @@ This document details the implementation of GitHub repository integration that e
 
 #### New Files Created
 
-1. **`bobscribe-backend/src/types/github.ts`** (76 lines)
+1. **`nats-backend/src/types/github.ts`** (76 lines)
    - Type definitions for GitHub API integration
    - Interfaces: `Repository`, `Branch`, `FileNode`, `FileContent`, `RepositoryMap`, `GitHubUser`, `OAuthInitResponse`, `OAuthCallbackResponse`, `ValidationResult`
 
-2. **`bobscribe-backend/src/services/github.service.ts`** (518 lines)
+2. **`nats-backend/src/services/github.service.ts`** (518 lines)
    - Complete GitHub API service implementation
    - OAuth flow management
    - Repository operations (fetch repo, branches, file tree, file content)
@@ -447,7 +447,7 @@ This document details the implementation of GitHub repository integration that e
    - Repository structure mapping
    - Health check endpoint
 
-3. **`bobscribe-backend/src/routes/github.routes.ts`** (283 lines)
+3. **`nats-backend/src/routes/github.routes.ts`** (283 lines)
    - GitHub API route handlers
    - OAuth endpoints: `/oauth/initiate`, `/oauth/callback`, `/oauth/validate`
    - Repository endpoints: `/repository/:owner/:repo`, `/repository/:owner/:repo/branches`, `/repository/:owner/:repo/tree/:branch`, `/repository/:owner/:repo/file`
@@ -455,19 +455,19 @@ This document details the implementation of GitHub repository integration that e
 
 #### Modified Files
 
-1. **`bobscribe-backend/src/config/env.ts`**
+1. **`nats-backend/src/config/env.ts`**
    - Added GitHub OAuth configuration variables
    - `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GITHUB_REDIRECT_URI` (optional)
 
-2. **`bobscribe-backend/.env.example`**
+2. **`nats-backend/.env.example`**
    - Added GitHub OAuth configuration template
    - Instructions for setting up GitHub OAuth app
 
-3. **`bobscribe-backend/src/index.ts`**
+3. **`nats-backend/src/index.ts`**
    - Registered GitHub routes with prefix `/api/v1/github`
    - Updated server startup banner with new endpoints
 
-4. **`bobscribe-backend/src/types/intent.ts`**
+4. **`nats-backend/src/types/intent.ts`**
    - Enhanced `AffectedFile` with `existsInRepo` and `currentContent` fields
    - Enhanced `AcceptanceCriteria` with `affectedFiles` and `testStrategy` fields
    - Added `CodeReference` interface for GitHub issues
@@ -476,13 +476,13 @@ This document details the implementation of GitHub repository integration that e
    - Enhanced `TechnicalTask` with `repository`, `codebaseContext`, `relatedFiles` fields
    - Updated `AnalyzeRequest` to accept optional repository context
 
-5. **`bobscribe-backend/src/services/watsonx.service.ts`**
+5. **`nats-backend/src/services/watsonx.service.ts`**
    - Enhanced `createSystemPrompt()` to accept optional `RepositoryMap`
    - Added `createGitHubContextSection()` method for codebase context
    - Updated `extractIntent()` to accept optional `repositoryMap` parameter
    - AI now receives full repository structure and maps requirements to actual files
 
-6. **`bobscribe-backend/src/routes/planner.routes.ts`**
+6. **`nats-backend/src/routes/planner.routes.ts`**
    - Integrated GitHub service with analysis pipeline
    - Fetches repository context when provided in request
    - Passes repository map to Watsonx AI for enhanced analysis
@@ -491,12 +491,12 @@ This document details the implementation of GitHub repository integration that e
 
 #### Modified Files
 
-1. **`bobscribe-planner/src/types/index.ts`**
+1. **`nats-planner/src/types/index.ts`**
    - Synchronized with backend type enhancements
    - Added `CodeReference`, `RepositoryInfo`, `CodebaseContext`, `RelatedFile` interfaces
    - Enhanced all interfaces to match backend schema
 
-2. **`bobscribe-planner/src/context/ProjectPlannerContext.tsx`**
+2. **`nats-planner/src/context/ProjectPlannerContext.tsx`**
    - Complete rewrite to integrate with backend API
    - Added `githubAccessToken` state for authentication
    - Added `error` state for error handling
@@ -505,7 +505,7 @@ This document details the implementation of GitHub repository integration that e
    - Enhanced `extractEngineeringIntent()` to include GitHub context
    - Removed mock data, now uses real API calls
 
-3. **`bobscribe-planner/src/components/LeftPanel.tsx`**
+3. **`nats-planner/src/components/LeftPanel.tsx`**
    - Added GitHub Personal Access Token input field
    - Enhanced UI to show connection status
    - Added error display
@@ -780,7 +780,7 @@ VITE_API_BASE_URL=http://localhost:3001
 ### 1. Backend Setup
 
 ```bash
-cd bobscribe-backend
+cd nats-backend
 
 # Install dependencies (already done)
 npm install
@@ -795,7 +795,7 @@ npm run dev
 ### 2. Frontend Setup
 
 ```bash
-cd bobscribe-planner
+cd nats-planner
 
 # Install dependencies
 npm install
@@ -815,7 +815,7 @@ npm run dev
    - `public_repo` (for public repositories)
    - `repo` (for private repositories - optional)
 4. Generate and copy token
-5. Paste token in BobScribe UI
+5. Paste token in NATS UI
 
 ---
 
@@ -826,10 +826,10 @@ npm run dev
 1. **Start Services:**
    ```bash
    # Terminal 1 - Backend
-   cd bobscribe-backend && npm run dev
+   cd nats-backend && npm run dev
    
    # Terminal 2 - Frontend
-   cd bobscribe-planner && npm run dev
+   cd nats-planner && npm run dev
    ```
 
 2. **Connect to GitHub:**

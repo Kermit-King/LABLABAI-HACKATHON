@@ -19,7 +19,7 @@ ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 1. Go to GitHub.com → Settings → Developer settings → Personal access tokens → Tokens (classic)
 2. Click "Generate new token (classic)"
-3. Give it a descriptive name (e.g., "BobScribe Access")
+3. Give it a descriptive name (e.g., "NATS Access")
 4. Select scopes:
    - ✅ `repo` (Full control of private repositories)
    - ✅ `public_repo` (Access public repositories)
@@ -198,7 +198,7 @@ const response = await fetch('http://localhost:3001/api/v1/planner/analyze', {
 To see detailed error messages, check the backend logs:
 
 ```bash
-cd bobscribe-backend
+cd nats-backend
 npm run dev
 ```
 
