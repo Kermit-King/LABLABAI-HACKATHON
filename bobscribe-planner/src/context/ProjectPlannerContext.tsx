@@ -13,6 +13,8 @@ interface ChatMessage {
 interface ProjectPlannerContextType extends ProjectPlannerState {
   setTranscript: (transcript: string) => void;
   extractEngineeringIntent: () => Promise<void>;
+  transcribeAudio: () => Promise<void>;
+  isTranscribing: boolean;
   toggleAcceptanceCriteria: (issueId: string, criteriaId: string) => void;
   toggleImplementationStep: (stepOrder: number) => void;
   resetState: () => void;
@@ -64,6 +66,7 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [githubAccessToken, setGithubAccessToken] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [isTranscribing, setIsTranscribing] = useState<boolean>(false);
 
   // Chatbot state
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -174,11 +177,50 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
   };
 
   /**
+   * Transcribe audio file only (without extraction)
+   */
+  const transcribeAudio = async () => {
+    if (!audioFile) {
+      setError('Please upload an audio file first');
+      return;
+    }
+
+    setIsTranscribing(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', audioFile);
+
+      const response = await fetch(`${API_BASE_URL}/api/v1/planner/transcribe`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to transcribe audio');
+      }
+
+      const data = await response.json();
+      
+      // Set the transcript in the textarea
+      setState(prev => ({ ...prev, transcript: data.data.transcript }));
+    } catch (error) {
+      console.error('Transcription error:', error);
+      setError(error instanceof Error ? error.message : 'Failed to transcribe audio');
+    } finally {
+      setIsTranscribing(false);
+    }
+  };
+
+  /**
    * Extract engineering intent with optional GitHub context
    */
   const extractEngineeringIntent = async () => {
-    if (!state.transcript.trim()) {
-      setError('Please enter a transcript');
+    // Allow extraction if either transcript or audio file is present
+    if (!state.transcript.trim() && !audioFile) {
+      setError('Please enter a transcript or upload an audio file');
       return;
     }
 
@@ -188,27 +230,49 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
     try {
       const parsed = isGithubConnected ? parseGithubUrl(githubRepoUrl) : null;
 
-      const requestBody: any = {
-        transcript: state.transcript,
-      };
+      let response;
 
-      // Add GitHub context if connected
-      if (parsed && isGithubConnected && githubAccessToken) {
-        requestBody.repository = {
-          owner: parsed.owner,
-          name: parsed.repo,
-          branch: selectedBranch,
-          token: githubAccessToken,
+      // If audio file is present, use multipart form data
+      if (audioFile) {
+        const formData = new FormData();
+        formData.append('file', audioFile);
+
+        // Add GitHub context if connected
+        if (parsed && isGithubConnected && githubAccessToken) {
+          formData.append('repository[owner]', parsed.owner);
+          formData.append('repository[name]', parsed.repo);
+          formData.append('repository[branch]', selectedBranch);
+          formData.append('repository[token]', githubAccessToken);
+        }
+
+        response = await fetch(`${API_BASE_URL}/api/v1/planner/analyze`, {
+          method: 'POST',
+          body: formData,
+        });
+      } else {
+        // Use JSON for text transcript
+        const requestBody: any = {
+          transcript: state.transcript,
         };
-      }
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/planner/analyze`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
+        // Add GitHub context if connected
+        if (parsed && isGithubConnected && githubAccessToken) {
+          requestBody.repository = {
+            owner: parsed.owner,
+            name: parsed.repo,
+            branch: selectedBranch,
+            token: githubAccessToken,
+          };
+        }
+
+        response = await fetch(`${API_BASE_URL}/api/v1/planner/analyze`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        });
+      }
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -219,6 +283,7 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
 
       setState(prev => ({
         ...prev,
+        transcript: data.data.transcript || prev.transcript, // Update transcript if returned
         technicalTask: data.data.technicalTask,
         githubIssues: data.data.githubIssues,
         bobPrompt: data.data.bobPrompt,
@@ -357,6 +422,8 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
         ...state,
         setTranscript,
         extractEngineeringIntent,
+        transcribeAudio,
+        isTranscribing,
         toggleAcceptanceCriteria,
         toggleImplementationStep,
         resetState,

@@ -10,9 +10,8 @@ const envSchema = z.object({
   PORT: z.string().default('3001').transform(Number),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 
-  // IBM Watson Speech-to-Text
-  WATSON_STT_APIKEY: z.string().min(1, 'Watson STT API key is required'),
-  WATSON_STT_URL: z.string().url('Watson STT URL must be a valid URL'),
+  // Fireworks AI Speech-to-Text
+  FIREWORKS_API_KEY: z.string().min(1, 'Fireworks AI API key is required'),
 
   // IBM Watsonx.ai
   WATSONX_URL: z.string().url('Watsonx URL must be a valid URL'),

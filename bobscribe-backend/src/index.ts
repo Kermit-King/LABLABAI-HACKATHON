@@ -90,6 +90,7 @@ async function bootstrap() {
 ║                                                           ║
 ║   Endpoints:                                              ║
 ║   - POST /api/v1/planner/analyze                         ║
+║   - POST /api/v1/planner/transcribe                      ║
 ║   - GET  /api/v1/planner/health                          ║
 ║   - GET  /api/v1/github/oauth/initiate                   ║
 ║   - POST /api/v1/github/oauth/callback                   ║

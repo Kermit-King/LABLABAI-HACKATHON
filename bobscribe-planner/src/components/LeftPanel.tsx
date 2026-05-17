@@ -9,6 +9,8 @@ export const LeftPanel: React.FC = () => {
     transcript,
     setTranscript,
     extractEngineeringIntent,
+    transcribeAudio,
+    isTranscribing,
     isProcessing,
     githubRepoUrl,
     setGithubRepoUrl,
@@ -154,9 +156,29 @@ export const LeftPanel: React.FC = () => {
               {audioFile ? `Uploaded: ${audioFile.name}` : 'Upload Audio File'}
             </Button>
             {audioFile && (
-              <p className="text-xs text-muted-foreground text-center">
-                Audio file ready for transcription
-              </p>
+              <>
+                <Button
+                  onClick={transcribeAudio}
+                  disabled={isTranscribing}
+                  variant="secondary"
+                  className="w-full justify-center"
+                >
+                  {isTranscribing ? (
+                    <>
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      Transcribing with Fireworks AI...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Transcribe Audio
+                    </>
+                  )}
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  Click "Transcribe Audio" to convert speech to text, or "Extract" to transcribe and analyze in one step
+                </p>
+              </>
             )}
           </div>
 
@@ -184,18 +206,18 @@ Example:
           
           <Button
             onClick={extractEngineeringIntent}
-            disabled={!transcript.trim() || isProcessing}
+            disabled={(!transcript.trim() && !audioFile) || isProcessing || isTranscribing}
             className="w-full text-sm font-medium"
           >
             {isProcessing ? (
               <>
                 <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                Processing...
+                {audioFile && !transcript.trim() ? 'Transcribing & Analyzing...' : 'Processing...'}
               </>
             ) : (
               <>
                 <Sparkles className="mr-2 h-4 w-4" />
-                Extract Engineering Intent
+                {audioFile && !transcript.trim() ? 'Transcribe & Extract' : 'Extract Engineering Intent'}
               </>
             )}
           </Button>
