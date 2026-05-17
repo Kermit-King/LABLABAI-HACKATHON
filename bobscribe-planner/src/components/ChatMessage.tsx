@@ -63,36 +63,36 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ content, role, timesta
   const parts = parseContent(content);
 
   return (
-    <div className={`flex ${role === 'user' ? 'justify-end' : 'justify-start'} mb-4`}>
+    <div className={`flex ${role === 'user' ? 'justify-end' : 'justify-start'} mb-3`}>
       <div
-        className={`max-w-[90%] rounded-lg ${
+        className={`max-w-[85%] rounded-lg ${
           role === 'user'
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
+            ? 'bg-indigo-600 dark:bg-indigo-700 text-white'
+            : 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100'
         }`}
       >
-        <div className="px-4 py-3">
+        <div className="px-3 py-2">
           {parts.map((part, index) => {
             if (part.type === 'code') {
               return (
-                <div key={index} className="my-3 -mx-4 first:mt-0 last:mb-0">
+                <div key={index} className="my-2 -mx-3 first:mt-0 last:mb-0">
                   <div className="relative group">
                     {/* Language label and copy button */}
-                    <div className="absolute top-0 right-0 flex items-center gap-2 p-2 z-10">
+                    <div className="absolute top-0 right-0 flex items-center gap-1.5 p-1.5 z-10">
                       {part.language && (
-                        <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded">
+                        <span className="text-xs text-slate-400 dark:text-slate-300 bg-slate-800 dark:bg-slate-900 px-2 py-0.5 rounded">
                           {part.language}
                         </span>
                       )}
                       <button
                         onClick={() => handleCopyCode(part.content, index)}
-                        className="p-2 rounded bg-gray-800 hover:bg-gray-700 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="p-1.5 rounded bg-slate-800 dark:bg-slate-900 hover:bg-slate-700 dark:hover:bg-slate-800 text-white opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Copy code"
                       >
                         {copiedIndex === index ? (
-                          <Check className="w-4 h-4" />
+                          <Check className="w-3.5 h-3.5" />
                         ) : (
-                          <Copy className="w-4 h-4" />
+                          <Copy className="w-3.5 h-3.5" />
                         )}
                       </button>
                     </div>
@@ -105,9 +105,9 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ content, role, timesta
                         customStyle={{
                           margin: 0,
                           borderRadius: '0.5rem',
-                          fontSize: '0.8rem',
-                          padding: '1rem',
-                          maxHeight: '400px',
+                          fontSize: '0.75rem',
+                          padding: '0.75rem',
+                          maxHeight: '300px',
                           overflowY: 'auto',
                         }}
                         showLineNumbers={part.content.split('\n').length > 5}
@@ -123,14 +123,14 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ content, role, timesta
             }
 
             return (
-              <p key={index} className="text-sm whitespace-pre-wrap break-words leading-relaxed">
+              <p key={index} className="text-xs whitespace-pre-wrap break-words leading-relaxed">
                 {part.content}
               </p>
             );
           })}
         </div>
-        <p className={`px-4 pb-2 text-xs ${role === 'user' ? 'opacity-70' : 'opacity-60'}`}>
-          {timestamp.toLocaleTimeString()}
+        <p className={`px-3 pb-1.5 text-[10px] ${role === 'user' ? 'text-white/70' : 'text-slate-500 dark:text-slate-400'}`}>
+          {timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </p>
       </div>
     </div>

@@ -25,9 +25,10 @@ export const Chatbot: React.FC = () => {
     setIsChatPanelOpen,
     isChatPopout,
     setIsChatPopout,
+    chatInputMessage,
+    setChatInputMessage,
   } = useProjectPlanner();
 
-  const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -44,10 +45,10 @@ export const Chatbot: React.FC = () => {
   }, [isChatPanelOpen, isChatPopout]);
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim() || isChatLoading) return;
+    if (!chatInputMessage.trim() || isChatLoading) return;
 
-    const message = inputMessage.trim();
-    setInputMessage('');
+    const message = chatInputMessage.trim();
+    setChatInputMessage('');
 
     try {
       await sendChatMessage(message);
@@ -63,12 +64,16 @@ export const Chatbot: React.FC = () => {
     }
   };
 
-  const togglePopout = () => {
-    setIsChatPopout(!isChatPopout);
-    if (!isChatPopout) {
-      // When popping out, close the panel
-      setIsChatPanelOpen(false);
-    }
+  const handleMinimize = () => {
+    // Minimize: close popout and open panel
+    setIsChatPopout(false);
+    setIsChatPanelOpen(true);
+  };
+
+  const handleClose = () => {
+    // Close: close both popout and panel
+    setIsChatPopout(false);
+    setIsChatPanelOpen(false);
   };
 
   const hasContext = transcript || technicalTask || githubIssues.length > 0 || bobPrompt;
@@ -76,18 +81,18 @@ export const Chatbot: React.FC = () => {
   // Popout floating window mode
   if (isChatPopout) {
     return (
-      <div className="fixed bottom-6 right-6 w-[500px] h-[700px] flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-2xl z-50 border border-gray-200 dark:border-gray-700">
+      <div className="fixed bottom-6 right-6 w-full max-w-md h-[85vh] max-h-[700px] flex flex-col bg-white dark:bg-slate-800 rounded-lg shadow-2xl z-50 border border-slate-200 dark:border-slate-700">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+        <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-t-lg">
           <div className="flex items-center gap-2">
-            <MessageCircle className="w-5 h-5" />
-            <h3 className="font-semibold">Ask BobScribe</h3>
+            <MessageCircle className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100">Ask BobScribe</h3>
           </div>
           <div className="flex items-center gap-2">
             {chatMessages.length > 0 && (
               <button
                 onClick={clearChatHistory}
-                className="p-1 hover:bg-blue-700 rounded transition-colors"
+                className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                 aria-label="Clear chat"
                 title="Clear chat history"
               >
@@ -95,17 +100,18 @@ export const Chatbot: React.FC = () => {
               </button>
             )}
             <button
-              onClick={togglePopout}
-              className="p-1 hover:bg-blue-700 rounded transition-colors"
-              aria-label="Dock to panel"
-              title="Dock to side panel"
+              onClick={handleMinimize}
+              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+              aria-label="Minimize to panel"
+              title="Minimize to side panel"
             >
               <Minimize2 className="w-4 h-4" />
             </button>
             <button
-              onClick={() => setIsChatPopout(false)}
-              className="p-1 hover:bg-blue-700 rounded transition-colors"
+              onClick={handleClose}
+              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
               aria-label="Close chatbot"
+              title="Close chatbot"
             >
               <X className="w-4 h-4" />
             </button>
@@ -113,25 +119,25 @@ export const Chatbot: React.FC = () => {
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent">
           {!hasContext ? (
-            <div className="flex items-center justify-center h-full text-center text-gray-500 dark:text-gray-400 px-4">
+            <div className="flex items-center justify-center h-full text-center text-slate-500 dark:text-slate-400 px-3">
               <div>
-                <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <MessageCircle className="w-10 h-10 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">
                   Analyze a meeting transcript first to start asking questions about your project.
                 </p>
               </div>
             </div>
           ) : chatMessages.length === 0 ? (
-            <div className="text-center text-gray-500 dark:text-gray-400 px-4">
-              <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p className="text-sm mb-4">
+            <div className="text-center text-slate-500 dark:text-slate-400 px-3">
+              <MessageCircle className="w-10 h-10 mx-auto mb-2 opacity-50" />
+              <p className="text-sm mb-3">
                 Ask me anything about your analyzed transcript, system blueprint, GitHub issues, or implementation steps!
               </p>
-              <div className="text-xs text-left space-y-2 bg-gray-50 dark:bg-gray-900 p-3 rounded">
-                <p className="font-semibold">Example questions:</p>
-                <ul className="list-disc list-inside space-y-1">
+              <div className="text-xs text-left space-y-2 bg-slate-50 dark:bg-slate-900/50 p-3 rounded border border-slate-200 dark:border-slate-700">
+                <p className="font-semibold text-slate-700 dark:text-slate-300">Example questions:</p>
+                <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400">
                   <li>What files need to be modified?</li>
                   <li>How do I implement step 2?</li>
                   <li>What are the acceptance criteria for issue #1?</li>
@@ -151,8 +157,8 @@ export const Chatbot: React.FC = () => {
               ))}
               {isChatLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-gray-100 dark:bg-gray-700 rounded-lg px-4 py-2">
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                  <div className="bg-slate-100 dark:bg-slate-700 rounded-lg px-3 py-2">
+                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                       <Loader2 className="w-4 h-4 animate-spin" />
                       <span className="text-sm">Thinking...</span>
                     </div>
@@ -165,23 +171,23 @@ export const Chatbot: React.FC = () => {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="p-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
           <div className="flex gap-2 items-end">
             <textarea
               ref={inputRef as any}
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
+              value={chatInputMessage}
+              onChange={(e) => setChatInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={hasContext ? "Ask a question..." : "Analyze transcript first..."}
               disabled={!hasContext || isChatLoading}
               rows={1}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm resize-none max-h-32 overflow-y-auto"
+              className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm resize-none max-h-24 overflow-y-auto"
               style={{ minHeight: '40px' }}
             />
             <Button
               onClick={handleSendMessage}
-              disabled={!inputMessage.trim() || !hasContext || isChatLoading}
-              className="px-4 py-2"
+              disabled={!chatInputMessage.trim() || !hasContext || isChatLoading}
+              className="px-3 py-2 shrink-0"
               aria-label="Send message"
             >
               {isChatLoading ? (
@@ -191,7 +197,7 @@ export const Chatbot: React.FC = () => {
               )}
             </Button>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
             Press Enter to send, Shift+Enter for new line
           </p>
         </div>
@@ -230,9 +236,10 @@ export const ChatPanel: React.FC = () => {
     isChatLoading,
     setIsChatPanelOpen,
     setIsChatPopout,
+    chatInputMessage,
+    setChatInputMessage,
   } = useProjectPlanner();
 
-  const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -245,10 +252,10 @@ export const ChatPanel: React.FC = () => {
   }, []);
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim() || isChatLoading) return;
+    if (!chatInputMessage.trim() || isChatLoading) return;
 
-    const message = inputMessage.trim();
-    setInputMessage('');
+    const message = chatInputMessage.trim();
+    setChatInputMessage('');
 
     try {
       await sendChatMessage(message);
@@ -265,69 +272,76 @@ export const ChatPanel: React.FC = () => {
   };
 
   const handlePopout = () => {
+    // Pop out: close panel and open popout
     setIsChatPanelOpen(false);
     setIsChatPopout(true);
+  };
+
+  const handleClose = () => {
+    // Close: close panel only
+    setIsChatPanelOpen(false);
   };
 
   const hasContext = transcript || technicalTask || githubIssues.length > 0 || bobPrompt;
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+    <div className="h-full flex flex-col bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+      <div className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-t-lg shrink-0">
         <div className="flex items-center gap-2">
-          <MessageCircle className="w-5 h-5" />
-          <h3 className="font-semibold">Ask BobScribe</h3>
+          <MessageCircle className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          <h3 className="font-semibold text-sm text-slate-800 dark:text-slate-100">Ask BobScribe</h3>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {chatMessages.length > 0 && (
             <button
               onClick={clearChatHistory}
-              className="p-1 hover:bg-blue-700 rounded transition-colors"
+              className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
               aria-label="Clear chat"
               title="Clear chat history"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
           )}
           <button
             onClick={handlePopout}
-            className="p-1 hover:bg-blue-700 rounded transition-colors"
+            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
             aria-label="Pop out"
             title="Pop out to floating window"
           >
-            <Maximize2 className="w-4 h-4" />
+            <Maximize2 className="w-3.5 h-3.5" />
           </button>
           <button
-            onClick={() => setIsChatPanelOpen(false)}
-            className="p-1 hover:bg-blue-700 rounded transition-colors"
+            onClick={handleClose}
+            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
             aria-label="Close panel"
+            title="Close panel"
           >
-            <X className="w-4 h-4" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-0 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent">
         {!hasContext ? (
-          <div className="flex items-center justify-center h-full text-center text-gray-500 dark:text-gray-400 px-4">
+          <div className="flex items-center justify-center h-full text-center text-slate-500 dark:text-slate-400 px-3">
             <div>
-              <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p className="text-sm">
+              <MessageCircle className="w-10 h-10 mx-auto mb-2 opacity-50" />
+              <p className="text-xs">
                 Analyze a meeting transcript first to start asking questions about your project.
               </p>
             </div>
           </div>
         ) : chatMessages.length === 0 ? (
-          <div className="text-center text-gray-500 dark:text-gray-400 px-4">
-            <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p className="text-sm mb-4">
+          <div className="text-center text-slate-500 dark:text-slate-400 px-3">
+            <MessageCircle className="w-10 h-10 mx-auto mb-2 opacity-50" />
+            <p className="text-xs mb-3">
               Ask me anything about your analyzed transcript, system blueprint, GitHub issues, or implementation steps!
             </p>
-            <div className="text-xs text-left space-y-2 bg-gray-50 dark:bg-gray-900 p-3 rounded">
-              <p className="font-semibold">Example questions:</p>
-              <ul className="list-disc list-inside space-y-1">
+            <div className="text-xs text-left space-y-2 bg-slate-50 dark:bg-slate-900/50 p-2.5 rounded border border-slate-200 dark:border-slate-700">
+              <p className="font-semibold text-slate-700 dark:text-slate-300">Example questions:</p>
+              <ul className="list-disc list-inside space-y-0.5 text-slate-600 dark:text-slate-400">
                 <li>What files need to be modified?</li>
                 <li>How do I implement step 2?</li>
                 <li>What are the acceptance criteria for issue #1?</li>
@@ -347,10 +361,10 @@ export const ChatPanel: React.FC = () => {
             ))}
             {isChatLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 dark:bg-gray-700 rounded-lg px-4 py-2">
-                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                <div className="bg-slate-100 dark:bg-slate-700 rounded-lg px-3 py-2">
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span className="text-sm">Thinking...</span>
+                    <span className="text-xs">Thinking...</span>
                   </div>
                 </div>
               </div>
@@ -361,23 +375,23 @@ export const ChatPanel: React.FC = () => {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="p-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 shrink-0">
         <div className="flex gap-2 items-end">
           <textarea
             ref={inputRef as any}
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
+            value={chatInputMessage}
+            onChange={(e) => setChatInputMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={hasContext ? "Ask a question..." : "Analyze transcript first..."}
             disabled={!hasContext || isChatLoading}
             rows={1}
-            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed text-sm resize-none max-h-32 overflow-y-auto"
-            style={{ minHeight: '40px' }}
+            className="flex-1 px-2.5 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 disabled:opacity-50 disabled:cursor-not-allowed text-xs resize-none max-h-20 overflow-y-auto"
+            style={{ minHeight: '36px' }}
           />
           <Button
             onClick={handleSendMessage}
-            disabled={!inputMessage.trim() || !hasContext || isChatLoading}
-            className="px-4 py-2"
+            disabled={!chatInputMessage.trim() || !hasContext || isChatLoading}
+            className="px-3 py-2 shrink-0"
             aria-label="Send message"
           >
             {isChatLoading ? (
@@ -387,7 +401,7 @@ export const ChatPanel: React.FC = () => {
             )}
           </Button>
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
           Press Enter to send, Shift+Enter for new line
         </p>
       </div>

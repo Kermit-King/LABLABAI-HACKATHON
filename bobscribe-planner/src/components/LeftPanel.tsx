@@ -185,7 +185,7 @@ Example:
           <Button
             onClick={extractEngineeringIntent}
             disabled={!transcript.trim() || isProcessing}
-            className="w-full"
+            className="w-full text-sm font-medium"
           >
             {isProcessing ? (
               <>
@@ -195,7 +195,7 @@ Example:
             ) : (
               <>
                 <Sparkles className="mr-2 h-4 w-4" />
-                Extract Engineering Intent {isGithubConnected && '(with GitHub Context)'}
+                Extract Engineering Intent
               </>
             )}
           </Button>

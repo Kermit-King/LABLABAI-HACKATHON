@@ -49,8 +49,8 @@ const AppContent = () => {
       <main className="container mx-auto px-4 py-6 lg:px-8">
         <div className={`flex flex-col gap-6 ${
           isChatPanelOpen
-            ? 'lg:grid lg:grid-cols-[420px_1fr_600px]'
-            : 'lg:grid lg:grid-cols-[420px_1fr]'
+            ? 'lg:grid lg:grid-cols-[380px_1fr_360px]'
+            : 'lg:grid lg:grid-cols-[380px_1fr]'
         }`}>
           {/* Left Panel */}
           <div className="w-full lg:sticky lg:top-24 lg:self-start">
@@ -64,7 +64,7 @@ const AppContent = () => {
 
           {/* Chat Panel (conditionally rendered) */}
           {isChatPanelOpen && (
-            <div className="w-full lg:sticky lg:top-24 lg:self-start h-[calc(100vh-8rem)]">
+            <div className="w-full lg:sticky lg:top-24 lg:self-start max-h-[calc(100vh-8rem)]">
               <ChatPanel />
             </div>
           )}

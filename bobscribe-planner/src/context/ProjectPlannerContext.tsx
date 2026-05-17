@@ -40,6 +40,9 @@ interface ProjectPlannerContextType extends ProjectPlannerState {
   setIsChatPanelOpen: (open: boolean) => void;
   isChatPopout: boolean;
   setIsChatPopout: (popout: boolean) => void;
+  // Shared input state
+  chatInputMessage: string;
+  setChatInputMessage: (message: string) => void;
 }
 
 const ProjectPlannerContext = createContext<ProjectPlannerContextType | undefined>(undefined);
@@ -67,6 +70,7 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
   const [isChatLoading, setIsChatLoading] = useState<boolean>(false);
   const [isChatPanelOpen, setIsChatPanelOpen] = useState<boolean>(true); // Default to panel mode
   const [isChatPopout, setIsChatPopout] = useState<boolean>(false); // Default to panel, not popout
+  const [chatInputMessage, setChatInputMessage] = useState<string>(''); // Shared input state
 
   const setTranscript = (transcript: string) => {
     setState(prev => ({ ...prev, transcript }));
@@ -374,6 +378,8 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
         sendChatMessage,
         clearChatHistory,
         isChatLoading,
+        chatInputMessage,
+        setChatInputMessage,
         isChatPanelOpen,
         setIsChatPanelOpen,
         isChatPopout,
