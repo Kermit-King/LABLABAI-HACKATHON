@@ -30,7 +30,6 @@ async function bootstrap() {
       'http://localhost:5173', // Vite dev server
       'http://localhost:3000', // Alternative frontend port
       'https://nats-backend.onrender.com', // Render.com domain
-      'https://*.vercel.app', // Vercel domain
 
     ],
     credentials: true,
