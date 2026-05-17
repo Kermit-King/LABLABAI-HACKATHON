@@ -88,6 +88,12 @@ export async function plannerRoutes(fastify: FastifyInstance) {
         try {
           fastify.log.info(`Fetching repository context: ${repositoryData.owner}/${repositoryData.name}@${repositoryData.branch}`);
           
+          // Validate token first
+          const isTokenValid = await githubService.validateToken(repositoryData.token);
+          if (!isTokenValid) {
+            throw new Error('GitHub token is invalid or expired');
+          }
+          
           // Fetch file tree
           const fileTree = await githubService.fetchFileTree(
             repositoryData.owner,
@@ -101,8 +107,16 @@ export async function plannerRoutes(fastify: FastifyInstance) {
           
           fastify.log.info(`Repository mapped: ${repositoryMap.relevantFiles.length} relevant files found`);
         } catch (error) {
-          fastify.log.warn({ err: error }, 'Failed to fetch repository context');
-          // Continue without repository context
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          fastify.log.warn({ err: error }, `Failed to fetch repository context: ${errorMessage}`);
+          
+          // If it's a token error, throw it so the user knows
+          if (errorMessage.includes('token') || errorMessage.includes('401') || errorMessage.includes('403')) {
+            throw new Error(`GitHub authentication failed: ${errorMessage}. Please check your access token.`);
+          }
+          
+          // For other errors, continue without repository context
+          fastify.log.info('Continuing analysis without repository context');
         }
       }
 
@@ -121,9 +135,27 @@ export async function plannerRoutes(fastify: FastifyInstance) {
     } catch (error) {
       fastify.log.error({ err: error }, 'Error in /analyze endpoint:');
       
-      return reply.code(500).send({
+      const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+      
+      // Determine appropriate status code based on error type
+      let statusCode = 500;
+      if (errorMessage.includes('token') || errorMessage.includes('authentication') || errorMessage.includes('401')) {
+        statusCode = 401;
+      } else if (errorMessage.includes('not found') || errorMessage.includes('404')) {
+        statusCode = 404;
+      } else if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
+        statusCode = 429;
+      } else if (errorMessage.includes('validation') || errorMessage.includes('invalid')) {
+        statusCode = 400;
+      }
+      
+      return reply.code(statusCode).send({
         success: false,
-        error: error instanceof Error ? error.message : 'Internal server error',
+        error: errorMessage,
+        errorType: statusCode === 401 ? 'authentication' :
+                   statusCode === 404 ? 'not_found' :
+                   statusCode === 429 ? 'rate_limit' :
+                   statusCode === 400 ? 'validation' : 'server_error'
       });
     }
   });

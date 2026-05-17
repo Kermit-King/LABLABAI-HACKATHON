@@ -109,13 +109,22 @@ class WatsonxService {
       "title": "string",
       "tags": ["string"],
       "description": "string (brief)",
-      "priority": "low" | "medium" | "high"
+      "acceptanceCriteria": [
+        {
+          "id": "ac-001-1",
+          "description": "string (brief)",
+          "completed": false
+        }
+      ],
+      "priority": "low" | "medium" | "high",
+      "estimatedEffort": "string (brief)"
     }
   ],
   "bobPrompt": {
     "systemContext": "string (brief)",
     "taskBreakdown": "string (concise)",
-    "fileInstructions": "string (key changes only)"
+    "fileInstructions": "string (key changes only)",
+    "acceptanceCriteria": "string (brief)"
   }
 }`;
 
@@ -528,6 +537,57 @@ IMPORTANT INSTRUCTIONS:
     return repairedJSON;
   }
 
+  /**
+   * Validate that JSON has all required fields for a complete response
+   */
+  private validateCompleteJSON(parsed: any): { valid: boolean; missing: string[] } {
+    const missing: string[] = [];
+    
+    // Check top-level required fields
+    if (!parsed.riskLevel) missing.push('riskLevel');
+    if (!parsed.technicalTask) missing.push('technicalTask');
+    if (!parsed.githubIssues) missing.push('githubIssues');
+    if (!parsed.bobPrompt) missing.push('bobPrompt');
+    
+    // Check technicalTask nested fields
+    if (parsed.technicalTask) {
+      if (!parsed.technicalTask.id) missing.push('technicalTask.id');
+      if (!parsed.technicalTask.title) missing.push('technicalTask.title');
+      if (!parsed.technicalTask.description) missing.push('technicalTask.description');
+      if (!parsed.technicalTask.affectedFiles) missing.push('technicalTask.affectedFiles');
+      if (!parsed.technicalTask.implementationOrder) missing.push('technicalTask.implementationOrder');
+      if (!parsed.technicalTask.estimatedEffort) missing.push('technicalTask.estimatedEffort');
+    }
+    
+    // Check githubIssues structure
+    if (parsed.githubIssues) {
+      if (!Array.isArray(parsed.githubIssues)) {
+        missing.push('githubIssues (must be array)');
+      } else if (parsed.githubIssues.length === 0) {
+        missing.push('githubIssues (empty array)');
+      } else {
+        // Check first issue has required fields
+        const firstIssue = parsed.githubIssues[0];
+        if (!firstIssue.id) missing.push('githubIssues[0].id');
+        if (!firstIssue.title) missing.push('githubIssues[0].title');
+        if (!firstIssue.description) missing.push('githubIssues[0].description');
+        if (!firstIssue.priority) missing.push('githubIssues[0].priority');
+        if (!firstIssue.acceptanceCriteria) missing.push('githubIssues[0].acceptanceCriteria');
+      }
+    }
+    
+    // Check bobPrompt structure
+    if (parsed.bobPrompt) {
+      if (!parsed.bobPrompt.systemContext) missing.push('bobPrompt.systemContext');
+      if (!parsed.bobPrompt.taskBreakdown) missing.push('bobPrompt.taskBreakdown');
+      if (!parsed.bobPrompt.fileInstructions) missing.push('bobPrompt.fileInstructions');
+    }
+    
+    return {
+      valid: missing.length === 0,
+      missing
+    };
+  }
 
   /**
    * Extract engineering intent from transcript using Watsonx.ai
@@ -657,6 +717,13 @@ JSON OUTPUT:`;
       let intentPayload: IntentPayload;
       try {
         intentPayload = JSON.parse(cleanedText);
+        
+        // Validate the parsed JSON has all required fields
+        const validation = this.validateCompleteJSON(intentPayload);
+        if (!validation.valid) {
+          console.warn('⚠️ Parsed JSON is missing required fields:', validation.missing);
+          console.warn('Will attempt to generate missing fields in normalization step');
+        }
       } catch (parseError) {
         console.error('JSON Parse Error:', parseError);
         console.error('Parse error details:', {
@@ -791,26 +858,46 @@ JSON OUTPUT:`;
         intentPayload.implementationOrder = intentPayload.technicalTask.implementationOrder;
       }
       
-      // Generate githubIssues if missing
-      if (!intentPayload.githubIssues && intentPayload.technicalTask) {
+      // Generate githubIssues if missing or ensure they have required fields
+      if (!intentPayload.githubIssues || intentPayload.githubIssues.length === 0) {
         console.log('🔨 Generating githubIssues from technicalTask');
-        intentPayload.githubIssues = [{
-          id: 'issue-001',
-          title: intentPayload.technicalTask.title,
-          tags: ['feature', 'auto-generated'],
-          description: intentPayload.technicalTask.description,
-          acceptanceCriteria: intentPayload.technicalTask.implementationOrder?.map((step, idx) => ({
-            id: `ac-001-${idx + 1}`,
-            description: step.description,
-            completed: step.completed,
-            affectedFiles: step.files,
-            testStrategy: 'Manual testing and code review'
-          })) || [],
-          priority: intentPayload.riskLevel === 'High' ? 'high' : intentPayload.riskLevel === 'Low' ? 'low' : 'medium',
-          estimatedEffort: intentPayload.technicalTask.estimatedEffort,
-          dependencies: intentPayload.technicalTask.codebaseContext?.dependencies || [],
-          labels: ['auto-generated']
-        }];
+        if (intentPayload.technicalTask) {
+          intentPayload.githubIssues = [{
+            id: 'issue-001',
+            title: intentPayload.technicalTask.title,
+            tags: ['feature', 'auto-generated'],
+            description: intentPayload.technicalTask.description,
+            acceptanceCriteria: intentPayload.technicalTask.implementationOrder?.map((step, idx) => ({
+              id: `ac-001-${idx + 1}`,
+              description: step.description,
+              completed: step.completed || false,
+              affectedFiles: step.files,
+              testStrategy: 'Manual testing and code review'
+            })) || [{
+              id: 'ac-001-1',
+              description: 'Complete the implementation as described',
+              completed: false
+            }],
+            priority: intentPayload.riskLevel === 'High' ? 'high' : intentPayload.riskLevel === 'Low' ? 'low' : 'medium',
+            estimatedEffort: intentPayload.technicalTask.estimatedEffort || '2-4 hours',
+            dependencies: intentPayload.technicalTask.codebaseContext?.dependencies || [],
+            labels: ['auto-generated']
+          }];
+        }
+      } else {
+        // Ensure existing issues have required fields
+        intentPayload.githubIssues = intentPayload.githubIssues.map((issue, idx) => ({
+          ...issue,
+          acceptanceCriteria: issue.acceptanceCriteria && issue.acceptanceCriteria.length > 0
+            ? issue.acceptanceCriteria
+            : [{
+                id: `ac-${issue.id || `00${idx + 1}`}-1`,
+                description: 'Complete the implementation as described',
+                completed: false
+              }],
+          estimatedEffort: issue.estimatedEffort || '2-4 hours',
+          priority: issue.priority || 'medium'
+        }));
       }
       
       // Generate bobPrompt if missing

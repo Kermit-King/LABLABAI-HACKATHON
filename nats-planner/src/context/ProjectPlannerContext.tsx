@@ -120,6 +120,7 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
   const [githubAccessToken, setGithubAccessToken] = useState<string>(persistedState.githubAccessToken);
   const [error, setError] = useState<string | null>(null);
   const [isTranscribing, setIsTranscribing] = useState<boolean>(false);
+  const [isExtracting, setIsExtracting] = useState<boolean>(false);
 
   // Chatbot state
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(persistedState.chatMessages);
@@ -289,19 +290,61 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
   };
 
   /**
+   * Validate GitHub token before using it
+   */
+  const validateGithubToken = async (token: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/github/oauth/validate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
+      });
+
+      if (!response.ok) {
+        return false;
+      }
+
+      const data = await response.json();
+      return data.success && data.data.valid;
+    } catch (error) {
+      console.error('Token validation error:', error);
+      return false;
+    }
+  };
+
+  /**
    * Extract engineering intent with optional GitHub context
    */
   const extractEngineeringIntent = async () => {
+    // Prevent concurrent extractions
+    if (isExtracting) {
+      console.warn('Extraction already in progress, ignoring duplicate request');
+      return;
+    }
+
     // Allow extraction if either transcript or audio file is present
     if (!state.transcript.trim() && !audioFile) {
       setError('Please enter a transcript or upload an audio file');
       return;
     }
 
+    setIsExtracting(true);
     setState(prev => ({ ...prev, isProcessing: true }));
     setError(null);
 
     try {
+      // Validate GitHub token if connected
+      if (isGithubConnected && githubAccessToken) {
+        console.log('Validating GitHub token...');
+        const isTokenValid = await validateGithubToken(githubAccessToken);
+        if (!isTokenValid) {
+          throw new Error('GitHub token is invalid or expired. Please reconnect to GitHub.');
+        }
+        console.log('✓ GitHub token validated successfully');
+      }
+
       const parsed = isGithubConnected ? parseGithubUrl(githubRepoUrl) : null;
 
       let response;
@@ -365,8 +408,11 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
       }));
     } catch (error) {
       console.error('Intent extraction error:', error);
-      setError(error instanceof Error ? error.message : 'Failed to extract engineering intent');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to extract engineering intent';
+      setError(errorMessage);
       setState(prev => ({ ...prev, isProcessing: false }));
+    } finally {
+      setIsExtracting(false);
     }
   };
 
