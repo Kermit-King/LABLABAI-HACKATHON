@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Sparkles, Github, Upload, Check, GitBranch, ExternalLink } from 'lucide-react';
+import { Sparkles, Github, Upload, Check, GitBranch, ExternalLink, X, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
@@ -26,7 +26,9 @@ export const LeftPanel: React.FC = () => {
     isConnecting,
     githubAccessToken,
     setGithubAccessToken,
-    error
+    error,
+    disconnectGithub,
+    clearAllData,
   } = useProjectPlanner();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -104,11 +106,11 @@ export const LeftPanel: React.FC = () => {
             </p>
           </div>
           
-          <div>
+          <div className="flex gap-2">
             <Button
               onClick={connectToGithub}
               disabled={!githubRepoUrl.trim() || !githubAccessToken.trim() || isGithubConnected || isConnecting}
-              className={isGithubConnected ? 'bg-green-600 hover:bg-green-700 w-full' : 'w-full'}
+              className={isGithubConnected ? 'bg-green-600 hover:bg-green-700 flex-1' : 'flex-1'}
               size="sm"
             >
               {isConnecting ? (
@@ -125,6 +127,17 @@ export const LeftPanel: React.FC = () => {
                 'Connect to Repository'
               )}
             </Button>
+            {isGithubConnected && (
+              <Button
+                onClick={disconnectGithub}
+                variant="outline"
+                size="sm"
+                className="px-3"
+                title="Disconnect and use a different repository"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
 
           {error && (
@@ -269,6 +282,17 @@ Example:
           </div>
         </CardContent>
       </Card>
+
+      {/* Clear All Data Button */}
+      <Button
+        onClick={clearAllData}
+        variant="outline"
+        size="sm"
+        className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+      >
+        <Trash2 className="mr-2 h-4 w-4" />
+        Clear All Data
+      </Button>
     </div>
   );
 };

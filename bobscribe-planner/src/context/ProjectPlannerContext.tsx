@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { ProjectPlannerState } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+const STORAGE_KEY = 'bobscribe-planner-state';
 
 interface ChatMessage {
   id: string;
@@ -18,6 +19,8 @@ interface ProjectPlannerContextType extends ProjectPlannerState {
   toggleAcceptanceCriteria: (issueId: string, criteriaId: string) => void;
   toggleImplementationStep: (stepOrder: number) => void;
   resetState: () => void;
+  clearAllData: () => void;
+  disconnectGithub: () => void;
   githubRepoUrl: string;
   setGithubRepoUrl: (url: string) => void;
   audioFile: File | null;
@@ -50,13 +53,26 @@ interface ProjectPlannerContextType extends ProjectPlannerState {
 const ProjectPlannerContext = createContext<ProjectPlannerContextType | undefined>(undefined);
 
 export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [state, setState] = useState<ProjectPlannerState>({
-    transcript: '',
-    technicalTask: null,
-    githubIssues: [],
-    bobPrompt: null,
-    isProcessing: false,
-  });
+  // Load initial state from localStorage
+  const loadPersistedState = (): ProjectPlannerState => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (error) {
+      console.error('Error loading persisted state:', error);
+    }
+    return {
+      transcript: '',
+      technicalTask: null,
+      githubIssues: [],
+      bobPrompt: null,
+      isProcessing: false,
+    };
+  };
+
+  const [state, setState] = useState<ProjectPlannerState>(loadPersistedState);
 
   const [githubRepoUrl, setGithubRepoUrl] = useState<string>('');
   const [audioFile, setAudioFile] = useState<File | null>(null);
@@ -74,6 +90,15 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
   const [isChatPanelOpen, setIsChatPanelOpen] = useState<boolean>(true); // Default to panel mode
   const [isChatPopout, setIsChatPopout] = useState<boolean>(false); // Default to panel, not popout
   const [chatInputMessage, setChatInputMessage] = useState<string>(''); // Shared input state
+
+  // Persist state to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (error) {
+      console.error('Error persisting state:', error);
+    }
+  }, [state]);
 
   const setTranscript = (transcript: string) => {
     setState(prev => ({ ...prev, transcript }));
@@ -339,6 +364,52 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
   };
 
   /**
+   * Disconnect from GitHub repository
+   */
+  const disconnectGithub = () => {
+    setIsGithubConnected(false);
+    setGithubRepoUrl('');
+    setGithubAccessToken('');
+    setSelectedBranch('');
+    setAvailableBranches([]);
+    setError(null);
+  };
+
+  /**
+   * Clear all data including persisted state
+   */
+  const clearAllData = () => {
+    // Reset all state
+    setState({
+      transcript: '',
+      technicalTask: null,
+      githubIssues: [],
+      bobPrompt: null,
+      isProcessing: false,
+    });
+    
+    // Reset GitHub connection
+    setIsGithubConnected(false);
+    setGithubRepoUrl('');
+    setGithubAccessToken('');
+    setSelectedBranch('');
+    setAvailableBranches([]);
+    
+    // Reset other state
+    setAudioFile(null);
+    setError(null);
+    setChatMessages([]);
+    setChatInputMessage('');
+    
+    // Clear localStorage
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (error) {
+      console.error('Error clearing localStorage:', error);
+    }
+  };
+
+  /**
    * Send a chat message to the chatbot
    */
   const sendChatMessage = async (question: string) => {
@@ -427,6 +498,8 @@ export const ProjectPlannerProvider: React.FC<{ children: ReactNode }> = ({ chil
         toggleAcceptanceCriteria,
         toggleImplementationStep,
         resetState,
+        clearAllData,
+        disconnectGithub,
         githubRepoUrl,
         setGithubRepoUrl,
         audioFile,
